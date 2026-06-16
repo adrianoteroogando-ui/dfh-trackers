@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meal Planner & Grocery List — Digital Fitness Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#EDE8E2;--orange:#E8622A;--black:#1C1C1C;--white:#FFFFFF;--gray:#5A5550;--light:#F4F1ED;--border:#CCC6BE;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--black);min-height:100vh;}
+  .header{background:var(--cream);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--orange);}
+  .header-brand{font-size:11px;font-weight:600;color:var(--orange);letter-spacing:2px;text-transform:uppercase;}
+  .header-title{font-size:20px;font-weight:800;color:var(--black);}
+  .header-right{font-size:11px;color:var(--gray);}
+  .tabs{background:var(--white);border-bottom:2px solid var(--border);padding:0 32px;display:flex;overflow-x:auto;}
+  .tab{padding:14px 20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;}
+  .tab:hover{color:var(--black);}
+  .tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+  .content{display:none;padding:32px;max-width:1100px;margin:0 auto;}
+  .content.active{display:block;}
+  .card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:24px;}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+  .kpi{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--orange);}
+  .kpi-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .kpi-value{font-size:28px;font-weight:800;color:var(--black);}
+  .kpi-unit{font-size:12px;color:var(--gray);margin-top:2px;}
+  .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);}
+  .form-group input,.form-group select,.form-group textarea{padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--black);background:var(--cream);}
+  .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--orange);}
+  .btn{background:var(--orange);color:var(--white);border:none;padding:12px 28px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:16px;}
+  .btn:hover{opacity:.85;}
+  .btn-secondary{background:transparent;color:var(--orange);border:2px solid var(--orange);margin-left:8px;}
+  .btn-sm{padding:8px 14px;font-size:12px;margin-top:0;}
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th{background:var(--orange);color:var(--white);padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:left;}
+  td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);}
+  tr:nth-child(even) td{background:var(--light);}
+  .delete-btn{color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;background:none;border:none;}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--black);color:var(--white);padding:14px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(20px);transition:all .3s;z-index:999;border-left:4px solid var(--orange);}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .step{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start;}
+  .step-num{background:var(--orange);color:var(--white);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+  .step-text h4{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .step-text p{font-size:13px;color:var(--gray);line-height:1.5;}
+  .empty{text-align:center;padding:40px;color:var(--gray);}
+  .empty-icon{font-size:40px;margin-bottom:12px;}
+  .meal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;}
+  .meal-day{background:var(--cream);border-radius:8px;padding:12px;min-height:120px;}
+  .meal-day-header{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--orange);margin-bottom:8px;}
+  .meal-item{font-size:11px;color:var(--black);padding:4px 6px;background:var(--white);border-radius:4px;margin-bottom:4px;}
+  .grocery-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .grocery-item:last-child{border-bottom:none;}
+  .grocery-check{width:20px;height:20px;border-radius:4px;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;}
+  .grocery-check.checked{background:var(--orange);border-color:var(--orange);color:var(--white);}
+  .grocery-name{font-size:14px;flex:1;}
+  .grocery-name.checked-text{text-decoration:line-through;color:var(--gray);}
+  .grocery-qty{font-size:12px;color:var(--gray);min-width:60px;text-align:right;}
+  @media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}.meal-grid{grid-template-columns:repeat(2,1fr);}.header{padding:12px 16px;}.content{padding:16px;}.tabs{padding:0 16px;}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="header-brand">Digital Fitness Hub</div>
+    <div class="header-title">Meal Planner & Grocery List</div>
+  </div>
+  <div class="header-right">Your data is saved locally on your device</div>
+</div>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('dashboard',this)">Dashboard</div>
+  <div class="tab" onclick="showTab('planner',this)">Meal Planner</div>
+  <div class="tab" onclick="showTab('grocery',this)">Grocery List</div>
+  <div class="tab" onclick="showTab('log',this)">Food Log</div>
+  <div class="tab" onclick="showTab('instructions',this)">Instructions</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="content active" id="tab-dashboard">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Meals Planned</div><div class="kpi-value" id="kpi-meals">0</div><div class="kpi-unit">this week</div></div>
+    <div class="kpi"><div class="kpi-label">Today's Calories</div><div class="kpi-value" id="kpi-cals">—</div><div class="kpi-unit">logged today</div></div>
+    <div class="kpi"><div class="kpi-label">Grocery Items</div><div class="kpi-value" id="kpi-grocery">0</div><div class="kpi-unit">on your list</div></div>
+    <div class="kpi"><div class="kpi-label">Days Logged</div><div class="kpi-value" id="kpi-days">0</div><div class="kpi-unit">food entries</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">This Week's Meal Plan</div>
+    <div class="meal-grid" id="weekly-preview">
+      ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="meal-day"><div class="meal-day-header">${d}</div><div style="font-size:11px;color:var(--gray);">No meals planned</div></div>`).join('')}
+    </div>
+  </div>
+</div>
+
+<!-- MEAL PLANNER -->
+<div class="content" id="tab-planner">
+  <div class="card">
+    <div class="card-title">Plan a Meal</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Day</label><select id="p-day"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select></div>
+      <div class="form-group"><label>Meal Type</label><select id="p-type"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></div>
+      <div class="form-group"><label>Meal / Recipe</label><input type="text" id="p-meal" placeholder="e.g. Chicken + Rice + Broccoli"></div>
+      <div class="form-group"><label>Calories</label><input type="number" id="p-calories" placeholder="e.g. 500"></div>
+      <div class="form-group"><label>Protein (g)</label><input type="number" id="p-protein" placeholder="e.g. 40"></div>
+      <div class="form-group"><label>Notes</label><input type="text" id="p-notes" placeholder="Prep notes..."></div>
+    </div>
+    <button class="btn" onclick="saveMeal()">Add to Plan</button>
+  </div>
+  <div class="card">
+    <div class="card-title">This Week's Plan</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Day</th><th>Meal</th><th>Food</th><th>Calories</th><th>Protein</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="planner-tbody"><tr><td colspan="7"><div class="empty"><div class="empty-icon">🍽️</div><p>No meals planned yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- GROCERY LIST -->
+<div class="content" id="tab-grocery">
+  <div class="card">
+    <div class="card-title">Add to Grocery List</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Item</label><input type="text" id="g-item" placeholder="e.g. Chicken breast"></div>
+      <div class="form-group"><label>Quantity</label><input type="text" id="g-qty" placeholder="e.g. 2 lbs"></div>
+      <div class="form-group"><label>Category</label><select id="g-cat"><option>Proteins</option><option>Vegetables</option><option>Fruits</option><option>Dairy</option><option>Grains</option><option>Snacks</option><option>Beverages</option><option>Other</option></select></div>
+    </div>
+    <button class="btn" onclick="addGrocery()">Add Item</button>
+    <button class="btn btn-secondary" onclick="clearChecked()">Remove Checked</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Your Grocery List</div>
+    <div id="grocery-list"><div class="empty"><div class="empty-icon">🛒</div><p>Your grocery list is empty</p></div></div>
+  </div>
+</div>
+
+<!-- FOOD LOG -->
+<div class="content" id="tab-log">
+  <div class="card">
+    <div class="card-title">Log Food</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" id="l-date"></div>
+      <div class="form-group"><label>Meal</label><select id="l-meal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></div>
+      <div class="form-group"><label>Food</label><input type="text" id="l-food" placeholder="e.g. Oatmeal + Banana"></div>
+      <div class="form-group"><label>Calories</label><input type="number" id="l-calories" placeholder="e.g. 380"></div>
+      <div class="form-group"><label>Protein (g)</label><input type="number" id="l-protein" placeholder="e.g. 12"></div>
+      <div class="form-group"><label>Notes</label><input type="text" id="l-notes" placeholder="Optional"></div>
+    </div>
+    <button class="btn" onclick="saveLog()">Save</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Food Log History</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Meal</th><th>Food</th><th>Calories</th><th>Protein</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="log-tbody"><tr><td colspan="7"><div class="empty"><div class="empty-icon">📋</div><p>No entries yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<div class="content" id="tab-instructions">
+  <div class="card">
+    <div class="card-title">How to Use Your Meal Planner</div>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><h4>Plan Your Week</h4><p>Go to Meal Planner and add meals for each day. Plan all 3 meals + snacks for the entire week on Sunday.</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><h4>Build Your Grocery List</h4><p>Add all ingredients you need to the Grocery List. Check items off as you shop.</p></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><h4>Log What You Eat</h4><p>Each day, use the Food Log to record what you actually ate with calories and protein.</p></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><h4>Review Your Dashboard</h4><p>The Dashboard shows your weekly plan overview, today's calories, and grocery list status.</p></div></div>
+  </div>
+  <div class="card" style="background:var(--orange);color:var(--white);">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--orange);margin-bottom:8px;">DIGITAL FITNESS HUB</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.8);">Questions? Contact us through Etsy. We respond within 24 hours.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const K={meals:'dfh_mp_meals',grocery:'dfh_mp_grocery',log:'dfh_mp_log'};
+function load(k){try{return JSON.parse(localStorage.getItem(k))||[];}catch{return[];}}
+function save(k,d){localStorage.setItem(k,JSON.stringify(d));}
+function showTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');document.getElementById('tab-'+name).classList.add('active');
+  if(name==='dashboard')renderDashboard();
+  if(name==='planner')renderPlanner();
+  if(name==='grocery')renderGrocery();
+  if(name==='log')renderLog();
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function saveMeal(){
+  const meal=document.getElementById('p-meal').value;
+  if(!meal){showToast('Please enter a meal');return;}
+  const meals=load(K.meals);
+  meals.push({id:Date.now(),day:document.getElementById('p-day').value,type:document.getElementById('p-type').value,meal,calories:document.getElementById('p-calories').value||'',protein:document.getElementById('p-protein').value||'',notes:document.getElementById('p-notes').value||''});
+  save(K.meals,meals);
+  ['p-meal','p-calories','p-protein','p-notes'].forEach(id=>document.getElementById(id).value='');
+  renderPlanner();renderDashboard();showToast('✓ Meal added!');
+}
+function deleteMeal(id){const m=load(K.meals).filter(m=>m.id!==id);save(K.meals,m);renderPlanner();renderDashboard();}
+function renderPlanner(){
+  const meals=load(K.meals);
+  const tbody=document.getElementById('planner-tbody');
+  if(!meals.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">🍽️</div><p>No meals planned yet</p></div></td></tr>';return;}
+  const order=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const sorted=meals.sort((a,b)=>order.indexOf(a.day)-order.indexOf(b.day));
+  tbody.innerHTML=sorted.map(m=>`<tr><td>${m.day}</td><td>${m.type}</td><td><strong>${m.meal}</strong></td><td>${m.calories||'—'}</td><td>${m.protein||'—'}g</td><td>${m.notes||'—'}</td><td><button class="delete-btn" onclick="deleteMeal(${m.id})">✕</button></td></tr>`).join('');
+}
+function addGrocery(){
+  const item=document.getElementById('g-item').value;
+  if(!item){showToast('Please enter an item');return;}
+  const grocery=load(K.grocery);
+  grocery.push({id:Date.now(),item,qty:document.getElementById('g-qty').value||'',cat:document.getElementById('g-cat').value,checked:false});
+  save(K.grocery,grocery);
+  ['g-item','g-qty'].forEach(id=>document.getElementById(id).value='');
+  renderGrocery();renderDashboard();showToast('✓ Added to list!');
+}
+function toggleGrocery(id){
+  const g=load(K.grocery);
+  const item=g.find(i=>i.id===id);
+  if(item)item.checked=!item.checked;
+  save(K.grocery,g);renderGrocery();
+}
+function clearChecked(){const g=load(K.grocery).filter(i=>!i.checked);save(K.grocery,g);renderGrocery();renderDashboard();showToast('Checked items removed');}
+function renderGrocery(){
+  const grocery=load(K.grocery);
+  const list=document.getElementById('grocery-list');
+  if(!grocery.length){list.innerHTML='<div class="empty"><div class="empty-icon">🛒</div><p>Your grocery list is empty</p></div>';return;}
+  const cats={};grocery.forEach(i=>{if(!cats[i.cat])cats[i.cat]=[];cats[i.cat].push(i);});
+  list.innerHTML=Object.entries(cats).map(([cat,items])=>`
+    <div style="margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--orange);text-transform:uppercase;margin-bottom:8px;">${cat}</div>
+      ${items.map(i=>`<div class="grocery-item">
+        <div class="grocery-check ${i.checked?'checked':''}" onclick="toggleGrocery(${i.id})">${i.checked?'✓':''}</div>
+        <div class="grocery-name ${i.checked?'checked-text':''}">${i.item}</div>
+        <div class="grocery-qty">${i.qty||''}</div>
+        <button class="delete-btn" onclick="deleteGrocery(${i.id})">✕</button>
+      </div>`).join('')}
+    </div>`).join('');
+}
+function deleteGrocery(id){const g=load(K.grocery).filter(i=>i.id!==id);save(K.grocery,g);renderGrocery();renderDashboard();}
+function saveLog(){
+  const date=document.getElementById('l-date').value;
+  const food=document.getElementById('l-food').value;
+  if(!date||!food){showToast('Please enter date and food');return;}
+  const entries=load(K.log);
+  entries.unshift({date,meal:document.getElementById('l-meal').value,food,calories:document.getElementById('l-calories').value||'',protein:document.getElementById('l-protein').value||'',notes:document.getElementById('l-notes').value||''});
+  save(K.log,entries);
+  ['l-food','l-calories','l-protein','l-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('l-date').value=new Date().toISOString().split('T')[0];
+  renderLog();renderDashboard();showToast('✓ Saved!');
+}
+function deleteLog(i){const e=load(K.log);e.splice(i,1);save(K.log,e);renderLog();renderDashboard();}
+function renderLog(){
+  const entries=load(K.log);
+  const tbody=document.getElementById('log-tbody');
+  if(!entries.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">📋</div><p>No entries yet</p></div></td></tr>';return;}
+  tbody.innerHTML=entries.map((e,i)=>`<tr><td>${e.date}</td><td>${e.meal}</td><td><strong>${e.food}</strong></td><td>${e.calories||'—'}</td><td>${e.protein||'—'}g</td><td>${e.notes||'—'}</td><td><button class="delete-btn" onclick="deleteLog(${i})">✕</button></td></tr>`).join('');
+}
+function renderDashboard(){
+  const meals=load(K.meals);
+  const grocery=load(K.grocery);
+  const log=load(K.log);
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('kpi-meals').textContent=meals.length;
+  document.getElementById('kpi-grocery').textContent=grocery.filter(i=>!i.checked).length;
+  document.getElementById('kpi-days').textContent=new Set(log.map(e=>e.date)).size;
+  const todayCals=log.filter(e=>e.date===today).reduce((s,e)=>s+(parseFloat(e.calories)||0),0);
+  document.getElementById('kpi-cals').textContent=todayCals||'0';
+  // weekly preview
+  const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const short=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const preview=document.getElementById('weekly-preview');
+  preview.innerHTML=days.map((day,i)=>{
+    const dayMeals=meals.filter(m=>m.day===day);
+    return`<div class="meal-day"><div class="meal-day-header">${short[i]}</div>${dayMeals.length?dayMeals.map(m=>`<div class="meal-item">${m.type}: ${m.meal}</div>`).join(''):'<div style="font-size:11px;color:var(--gray);">No meals planned</div>'}</div>`;
+  }).join('');
+}
+document.getElementById('l-date').value=new Date().toISOString().split('T')[0];
+renderDashboard();
+</script>
+</body>
+</html>

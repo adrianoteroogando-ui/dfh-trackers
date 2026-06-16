@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weight Loss Tracker — Digital Fitness Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --cream:#EDE8E2; --orange:#E8622A; --black:#1C1C1C; --white:#FFFFFF; --gray:#5A5550; --light:#F4F1ED; --border:#CCC6BE; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--black);min-height:100vh;}
+  .header{background:var(--cream);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--orange);}
+  .header-brand{font-size:11px;font-weight:600;color:var(--orange);letter-spacing:2px;text-transform:uppercase;}
+  .header-title{font-size:20px;font-weight:800;color:var(--black);}
+  .header-right{font-size:11px;color:var(--gray);}
+  .tabs{background:var(--white);border-bottom:2px solid var(--border);padding:0 32px;display:flex;overflow-x:auto;}
+  .tab{padding:14px 20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;}
+  .tab:hover{color:var(--black);}
+  .tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+  .content{display:none;padding:32px;max-width:1100px;margin:0 auto;}
+  .content.active{display:block;}
+  .card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:24px;}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+  .kpi{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--orange);}
+  .kpi-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .kpi-value{font-size:28px;font-weight:800;color:var(--black);}
+  .kpi-unit{font-size:12px;color:var(--gray);margin-top:2px;}
+  .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);}
+  .form-group input,.form-group select,.form-group textarea{padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--black);background:var(--cream);transition:border-color .2s;}
+  .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--orange);}
+  .btn{background:var(--orange);color:var(--white);border:none;padding:12px 28px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:16px;}
+  .btn:hover{opacity:.85;}
+  .btn-secondary{background:transparent;color:var(--orange);border:2px solid var(--orange);margin-left:8px;}
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th{background:var(--orange);color:var(--white);padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:left;}
+  td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);}
+  tr:nth-child(even) td{background:var(--light);}
+  tr:hover td{background:#E4DED7;}
+  .delete-btn{color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;background:none;border:none;}
+  .progress-bar-wrap{background:var(--border);border-radius:99px;height:10px;overflow:hidden;margin-top:8px;}
+  .progress-bar{background:var(--orange);height:100%;border-radius:99px;transition:width .5s;}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--black);color:var(--white);padding:14px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(20px);transition:all .3s;z-index:999;border-left:4px solid var(--orange);}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .step{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start;}
+  .step-num{background:var(--orange);color:var(--white);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+  .step-text h4{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .step-text p{font-size:13px;color:var(--gray);line-height:1.5;}
+  .empty{text-align:center;padding:40px;color:var(--gray);}
+  .empty-icon{font-size:40px;margin-bottom:12px;}
+  .goal-item{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border);}
+  .goal-item:last-child{border-bottom:none;}
+  .chart-area{height:200px;display:flex;align-items:flex-end;gap:4px;padding:16px 0 0;}
+  .chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;}
+  .chart-bar{width:100%;background:var(--orange);border-radius:4px 4px 0 0;min-height:4px;transition:height .5s;}
+  .chart-label{font-size:9px;color:var(--gray);text-align:center;}
+  .chart-value{font-size:10px;font-weight:600;color:var(--black);}
+  @media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}.header{padding:12px 16px;}.content{padding:16px;}.tabs{padding:0 16px;}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="header-brand">Digital Fitness Hub</div>
+    <div class="header-title">Weight Loss Tracker</div>
+  </div>
+  <div class="header-right">Your data is saved locally on your device</div>
+</div>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('dashboard',this)">Dashboard</div>
+  <div class="tab" onclick="showTab('food',this)">Food Log</div>
+  <div class="tab" onclick="showTab('weighin',this)">Weigh-In</div>
+  <div class="tab" onclick="showTab('goals',this)">Goals</div>
+  <div class="tab" onclick="showTab('chart',this)">Progress Chart</div>
+  <div class="tab" onclick="showTab('instructions',this)">Instructions</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="content active" id="tab-dashboard">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Current Weight</div><div class="kpi-value" id="kpi-current">—</div><div class="kpi-unit">lbs / kg</div></div>
+    <div class="kpi"><div class="kpi-label">Total Lost</div><div class="kpi-value" id="kpi-lost">—</div><div class="kpi-unit">from start</div></div>
+    <div class="kpi"><div class="kpi-label">Today's Calories</div><div class="kpi-value" id="kpi-cals">—</div><div class="kpi-unit">eaten today</div></div>
+    <div class="kpi"><div class="kpi-label">Days Logged</div><div class="kpi-value" id="kpi-days">0</div><div class="kpi-unit">total entries</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Goal Progress</div>
+    <div id="progress-label" style="font-size:13px;color:var(--gray);margin-bottom:6px;">Set your goal weight in the Goals tab</div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Recent Weigh-Ins</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Weight</th><th>Change</th><th>Notes</th></tr></thead>
+      <tbody id="dashboard-tbody"><tr><td colspan="4"><div class="empty"><div class="empty-icon">⚖️</div><p>No weigh-ins yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- FOOD LOG -->
+<div class="content" id="tab-food">
+  <div class="card">
+    <div class="card-title">Log Today's Food</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" id="f-date"></div>
+      <div class="form-group"><label>Meal</label><select id="f-meal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select></div>
+      <div class="form-group"><label>Food Item</label><input type="text" id="f-item" placeholder="e.g. Chicken + Rice"></div>
+      <div class="form-group"><label>Calories</label><input type="number" id="f-calories" placeholder="e.g. 450"></div>
+      <div class="form-group"><label>Protein (g)</label><input type="number" id="f-protein" placeholder="e.g. 35"></div>
+      <div class="form-group"><label>Notes</label><input type="text" id="f-notes" placeholder="Optional"></div>
+    </div>
+    <button class="btn" onclick="saveFood()">Save Entry</button>
+    <button class="btn btn-secondary" onclick="clearFood()">Clear</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Food Log History</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Meal</th><th>Food</th><th>Calories</th><th>Protein</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="food-tbody"><tr><td colspan="7"><div class="empty"><div class="empty-icon">🥗</div><p>No entries yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- WEIGH-IN -->
+<div class="content" id="tab-weighin">
+  <div class="card">
+    <div class="card-title">Log Weigh-In</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" id="w-date"></div>
+      <div class="form-group"><label>Weight (lbs/kg)</label><input type="number" step="0.1" id="w-weight" placeholder="e.g. 175.5"></div>
+      <div class="form-group"><label>Notes</label><input type="text" id="w-notes" placeholder="How are you feeling?"></div>
+    </div>
+    <button class="btn" onclick="saveWeighIn()">Save Weigh-In</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Weigh-In History</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Weight</th><th>Change</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="weighin-tbody"><tr><td colspan="5"><div class="empty"><div class="empty-icon">⚖️</div><p>No weigh-ins yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- GOALS -->
+<div class="content" id="tab-goals">
+  <div class="card">
+    <div class="card-title">Set Your Goals</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Starting Weight</label><input type="number" step="0.1" id="g-start" placeholder="e.g. 185"></div>
+      <div class="form-group"><label>Goal Weight</label><input type="number" step="0.1" id="g-goal" placeholder="e.g. 160"></div>
+      <div class="form-group"><label>Daily Calorie Target</label><input type="number" id="g-calories" placeholder="e.g. 1800"></div>
+      <div class="form-group"><label>Daily Protein Target (g)</label><input type="number" id="g-protein" placeholder="e.g. 150"></div>
+      <div class="form-group"><label>Start Date</label><input type="date" id="g-startdate"></div>
+      <div class="form-group"><label>Target Date</label><input type="date" id="g-targetdate"></div>
+    </div>
+    <button class="btn" onclick="saveGoals()">Save Goals</button>
+  </div>
+  <div class="card" id="goals-summary" style="display:none">
+    <div class="card-title">Goals Summary</div>
+    <div id="goals-display"></div>
+  </div>
+</div>
+
+<!-- CHART -->
+<div class="content" id="tab-chart">
+  <div class="card">
+    <div class="card-title">Weight Progress Chart</div>
+    <div id="chart-container"><div class="empty"><div class="empty-icon">📉</div><p>Add at least 2 weigh-ins to see your chart</p></div></div>
+  </div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<div class="content" id="tab-instructions">
+  <div class="card">
+    <div class="card-title">How to Use Your Weight Loss Tracker</div>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><h4>Set Your Goals</h4><p>Go to Goals tab. Enter your starting weight, goal weight, daily calorie target and target date.</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><h4>Log Your Food Daily</h4><p>Use the Food Log tab to track every meal. Log breakfast, lunch, dinner and snacks with calories and protein.</p></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><h4>Weigh In Weekly</h4><p>Go to Weigh-In tab every week (same day, same time, same conditions) and log your weight.</p></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><h4>Check Your Dashboard</h4><p>The Dashboard shows your current weight, total lost, today's calories and overall progress automatically.</p></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-text"><h4>Your Data is Safe</h4><p>All data is saved locally on your device. It never leaves your computer and stays completely private.</p></div></div>
+  </div>
+  <div class="card" style="background:var(--orange);color:var(--white);">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--orange);margin-bottom:8px;">DIGITAL FITNESS HUB</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.8);">Questions? Contact us through Etsy. We respond within 24 hours.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const K={food:'dfh_wl_food',weighin:'dfh_wl_weighin',goals:'dfh_wl_goals'};
+function load(k){try{return JSON.parse(localStorage.getItem(k))||[];}catch{return[];}}
+function loadObj(k){try{return JSON.parse(localStorage.getItem(k))||{};}catch{return{};}}
+function save(k,d){localStorage.setItem(k,JSON.stringify(d));}
+function showTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='dashboard')renderDashboard();
+  if(name==='food')renderFood();
+  if(name==='weighin')renderWeighIn();
+  if(name==='goals')renderGoals();
+  if(name==='chart')renderChart();
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function saveFood(){
+  const date=document.getElementById('f-date').value;
+  const item=document.getElementById('f-item').value;
+  if(!date||!item){showToast('Please enter date and food item');return;}
+  const entries=load(K.food);
+  entries.unshift({date,meal:document.getElementById('f-meal').value,item,calories:document.getElementById('f-calories').value||'',protein:document.getElementById('f-protein').value||'',notes:document.getElementById('f-notes').value||''});
+  save(K.food,entries);clearFood();renderFood();renderDashboard();showToast('✓ Food entry saved!');
+}
+function clearFood(){['f-date','f-item','f-calories','f-protein','f-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('f-date').value=new Date().toISOString().split('T')[0];document.getElementById('f-meal').value='Breakfast';}
+function deleteFood(i){const e=load(K.food);e.splice(i,1);save(K.food,e);renderFood();renderDashboard();showToast('Deleted');}
+function renderFood(){
+  const entries=load(K.food);
+  const tbody=document.getElementById('food-tbody');
+  if(!entries.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">🥗</div><p>No entries yet</p></div></td></tr>';return;}
+  tbody.innerHTML=entries.map((e,i)=>`<tr><td>${e.date}</td><td>${e.meal}</td><td><strong>${e.item}</strong></td><td>${e.calories||'—'}</td><td>${e.protein||'—'}g</td><td>${e.notes||'—'}</td><td><button class="delete-btn" onclick="deleteFood(${i})">✕</button></td></tr>`).join('');
+}
+function saveWeighIn(){
+  const date=document.getElementById('w-date').value;
+  const weight=document.getElementById('w-weight').value;
+  if(!date||!weight){showToast('Please enter date and weight');return;}
+  const entries=load(K.weighin);
+  entries.unshift({date,weight:parseFloat(weight),notes:document.getElementById('w-notes').value||''});
+  save(K.weighin,entries);
+  ['w-date','w-weight','w-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('w-date').value=new Date().toISOString().split('T')[0];
+  renderWeighIn();renderDashboard();renderChart();showToast('✓ Weigh-in saved!');
+}
+function deleteWeighIn(i){const e=load(K.weighin);e.splice(i,1);save(K.weighin,e);renderWeighIn();renderDashboard();renderChart();showToast('Deleted');}
+function renderWeighIn(){
+  const entries=load(K.weighin);
+  const tbody=document.getElementById('weighin-tbody');
+  if(!entries.length){tbody.innerHTML='<tr><td colspan="5"><div class="empty"><div class="empty-icon">⚖️</div><p>No weigh-ins yet</p></div></td></tr>';return;}
+  tbody.innerHTML=entries.map((e,i)=>{
+    const prev=entries[i+1];
+    const change=prev?((e.weight-prev.weight)>0?'+':'')+((e.weight-prev.weight).toFixed(1)):'—';
+    const color=prev?(e.weight<prev.weight?'color:green':'color:var(--orange)'):'';
+    return`<tr><td>${e.date}</td><td><strong>${e.weight}</strong></td><td style="${color}">${change}</td><td>${e.notes||'—'}</td><td><button class="delete-btn" onclick="deleteWeighIn(${i})">✕</button></td></tr>`;
+  }).join('');
+}
+function saveGoals(){
+  const g={start:document.getElementById('g-start').value,goal:document.getElementById('g-goal').value,calories:document.getElementById('g-calories').value,protein:document.getElementById('g-protein').value,startdate:document.getElementById('g-startdate').value,targetdate:document.getElementById('g-targetdate').value};
+  save(K.goals,g);renderGoals();renderDashboard();showToast('✓ Goals saved!');
+}
+function renderGoals(){
+  const g=loadObj(K.goals);
+  if(g.start){
+    document.getElementById('g-start').value=g.start;
+    document.getElementById('g-goal').value=g.goal;
+    document.getElementById('g-calories').value=g.calories;
+    document.getElementById('g-protein').value=g.protein;
+    document.getElementById('g-startdate').value=g.startdate;
+    document.getElementById('g-targetdate').value=g.targetdate;
+    const tolose=(parseFloat(g.start)-parseFloat(g.goal)).toFixed(1);
+    document.getElementById('goals-summary').style.display='block';
+    document.getElementById('goals-display').innerHTML=`
+      <div class="goal-item"><span>Starting Weight</span><strong>${g.start}</strong></div>
+      <div class="goal-item"><span>Goal Weight</span><strong>${g.goal}</strong></div>
+      <div class="goal-item"><span>Total to Lose</span><strong>${tolose} lbs/kg</strong></div>
+      <div class="goal-item"><span>Daily Calorie Target</span><strong>${g.calories||'—'} cal</strong></div>
+      <div class="goal-item"><span>Daily Protein Target</span><strong>${g.protein||'—'} g</strong></div>
+      <div class="goal-item"><span>Target Date</span><strong>${g.targetdate||'—'}</strong></div>`;
+  }
+}
+function renderDashboard(){
+  const weighins=load(K.weighin);
+  const food=load(K.food);
+  const goals=loadObj(K.goals);
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('kpi-days').textContent=weighins.length;
+  if(weighins.length>0){
+    const current=weighins[0].weight;
+    document.getElementById('kpi-current').textContent=current;
+    if(goals.start){
+      const lost=(parseFloat(goals.start)-current).toFixed(1);
+      document.getElementById('kpi-lost').textContent=(lost>0?'-':'+')+Math.abs(lost);
+      if(goals.goal){
+        const totalToLose=parseFloat(goals.start)-parseFloat(goals.goal);
+        const actualLost=parseFloat(goals.start)-current;
+        const pct=Math.min(100,Math.max(0,Math.round((actualLost/totalToLose)*100)));
+        document.getElementById('progress-bar').style.width=pct+'%';
+        document.getElementById('progress-label').textContent=`${pct}% of your goal complete`;
+      }
+    }
+    const recent=weighins.slice(0,7);
+    document.getElementById('dashboard-tbody').innerHTML=recent.map((e,i)=>{
+      const prev=recent[i+1];
+      const change=prev?((e.weight-prev.weight)>0?'+':'')+((e.weight-prev.weight).toFixed(1)):'—';
+      return`<tr><td>${e.date}</td><td><strong>${e.weight}</strong></td><td>${change}</td><td>${e.notes||'—'}</td></tr>`;
+    }).join('');
+  }
+  const todayFood=food.filter(e=>e.date===today);
+  const todayCals=todayFood.reduce((s,e)=>s+(parseFloat(e.calories)||0),0);
+  document.getElementById('kpi-cals').textContent=todayCals||'0';
+}
+function renderChart(){
+  const entries=load(K.weighin).filter(e=>e.weight).reverse().slice(-12);
+  const container=document.getElementById('chart-container');
+  if(entries.length<2){container.innerHTML='<div class="empty"><div class="empty-icon">📉</div><p>Add at least 2 weigh-ins to see your chart</p></div>';return;}
+  const weights=entries.map(e=>e.weight);
+  const maxW=Math.max(...weights),minW=Math.min(...weights),range=maxW-minW||1;
+  container.innerHTML=`<div class="chart-area">${entries.map(e=>{
+    const h=Math.max(8,Math.round(((e.weight-minW)/range)*150+20));
+    return`<div class="chart-bar-wrap"><div class="chart-value">${e.weight}</div><div class="chart-bar" style="height:${h}px"></div><div class="chart-label">${e.date.slice(5)}</div></div>`;
+  }).join('')}</div>`;
+}
+document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+document.getElementById('w-date').value=new Date().toISOString().split('T')[0];
+renderDashboard();
+</script>
+</body>
+</html>

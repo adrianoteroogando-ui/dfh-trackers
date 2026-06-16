@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yoga & Flexibility Tracker — Digital Fitness Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#EDE8E2;--orange:#E8622A;--black:#1C1C1C;--white:#FFFFFF;--gray:#5A5550;--light:#F4F1ED;--border:#CCC6BE;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--black);min-height:100vh;}
+  .header{background:var(--cream);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--orange);}
+  .header-brand{font-size:11px;font-weight:600;color:var(--orange);letter-spacing:2px;text-transform:uppercase;}
+  .header-title{font-size:20px;font-weight:800;color:var(--black);}
+  .header-right{font-size:11px;color:var(--gray);}
+  .tabs{background:var(--white);border-bottom:2px solid var(--border);padding:0 32px;display:flex;overflow-x:auto;}
+  .tab{padding:14px 20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;}
+  .tab:hover{color:var(--black);}
+  .tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+  .content{display:none;padding:32px;max-width:1100px;margin:0 auto;}
+  .content.active{display:block;}
+  .card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:24px;}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+  .kpi{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--orange);}
+  .kpi-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .kpi-value{font-size:28px;font-weight:800;color:var(--black);}
+  .kpi-unit{font-size:12px;color:var(--gray);margin-top:2px;}
+  .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);}
+  .form-group input,.form-group select,.form-group textarea{padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--black);background:var(--cream);}
+  .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--orange);}
+  .btn{background:var(--orange);color:var(--white);border:none;padding:12px 28px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:16px;}
+  .btn:hover{opacity:.85;}
+  .btn-secondary{background:transparent;color:var(--orange);border:2px solid var(--orange);margin-left:8px;}
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th{background:var(--orange);color:var(--white);padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:left;}
+  td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);}
+  tr:nth-child(even) td{background:var(--light);}
+  .delete-btn{color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;background:none;border:none;}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--black);color:var(--white);padding:14px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(20px);transition:all .3s;z-index:999;border-left:4px solid var(--orange);}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .step{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start;}
+  .step-num{background:var(--orange);color:var(--white);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+  .step-text h4{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .step-text p{font-size:13px;color:var(--gray);line-height:1.5;}
+  .empty{text-align:center;padding:40px;color:var(--gray);}
+  .empty-icon{font-size:40px;margin-bottom:12px;}
+  .pose-card{background:var(--cream);border-radius:8px;padding:14px;border-left:3px solid var(--orange);margin-bottom:8px;}
+  .pose-name{font-size:14px;font-weight:700;}
+  .pose-meta{font-size:11px;color:var(--gray);margin-top:4px;}
+  @media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}.header{padding:12px 16px;}.content{padding:16px;}.tabs{padding:0 16px;}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="header-brand">Digital Fitness Hub</div>
+    <div class="header-title">Yoga & Flexibility Tracker</div>
+  </div>
+  <div class="header-right">Your data is saved locally on your device</div>
+</div>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('dashboard',this)">Dashboard</div>
+  <div class="tab" onclick="showTab('log',this)">Session Log</div>
+  <div class="tab" onclick="showTab('flexibility',this)">Flexibility</div>
+  <div class="tab" onclick="showTab('poses',this)">Pose Library</div>
+  <div class="tab" onclick="showTab('goals',this)">Goals</div>
+  <div class="tab" onclick="showTab('instructions',this)">Instructions</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="content active" id="tab-dashboard">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Total Sessions</div><div class="kpi-value" id="kpi-sessions">0</div><div class="kpi-unit">logged</div></div>
+    <div class="kpi"><div class="kpi-label">This Month</div><div class="kpi-value" id="kpi-month">0</div><div class="kpi-unit">sessions</div></div>
+    <div class="kpi"><div class="kpi-label">Total Minutes</div><div class="kpi-value" id="kpi-minutes">0</div><div class="kpi-unit">of practice</div></div>
+    <div class="kpi"><div class="kpi-label">Avg Feeling</div><div class="kpi-value" id="kpi-feel">—</div><div class="kpi-unit">out of 10</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Recent Sessions</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Style</th><th>Duration</th><th>Feeling</th><th>Notes</th></tr></thead>
+      <tbody id="dashboard-tbody"><tr><td colspan="5"><div class="empty"><div class="empty-icon">🧘</div><p>No sessions yet — start your practice!</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- SESSION LOG -->
+<div class="content" id="tab-log">
+  <div class="card">
+    <div class="card-title">Log a Session</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" id="l-date"></div>
+      <div class="form-group"><label>Yoga Style</label><select id="l-style"><option>Vinyasa</option><option>Hatha</option><option>Yin Yoga</option><option>Power Yoga</option><option>Restorative</option><option>Ashtanga</option><option>Kundalini</option><option>Bikram / Hot Yoga</option><option>Meditation</option><option>Flexibility Flow</option><option>Other</option></select></div>
+      <div class="form-group"><label>Duration (minutes)</label><input type="number" id="l-duration" placeholder="e.g. 45"></div>
+      <div class="form-group"><label>How Did It Feel? (1-10)</label><input type="number" id="l-feel" placeholder="e.g. 8" min="1" max="10"></div>
+      <div class="form-group"><label>Instructor / App</label><input type="text" id="l-instructor" placeholder="e.g. Yoga with Adriene"></div>
+      <div class="form-group"><label>Notes</label><input type="text" id="l-notes" placeholder="What did you practice?"></div>
+    </div>
+    <button class="btn" onclick="saveSession()">Save Session</button>
+    <button class="btn btn-secondary" onclick="clearSession()">Clear</button>
+  </div>
+  <div class="card">
+    <div class="card-title">All Sessions</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Style</th><th>Duration</th><th>Feel</th><th>Instructor</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="log-tbody"><tr><td colspan="7"><div class="empty"><div class="empty-icon">📝</div><p>No sessions yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- FLEXIBILITY -->
+<div class="content" id="tab-flexibility">
+  <div class="card">
+    <div class="card-title">Log Flexibility Measurement</div>
+    <p style="font-size:13px;color:var(--gray);margin-bottom:16px;">Rate your flexibility in each area from 1 (very tight) to 10 (very flexible). Track monthly to see progress.</p>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" id="f-date"></div>
+      <div class="form-group"><label>Hamstrings (1-10)</label><input type="number" id="f-hamstrings" placeholder="e.g. 6" min="1" max="10"></div>
+      <div class="form-group"><label>Hips (1-10)</label><input type="number" id="f-hips" placeholder="e.g. 7" min="1" max="10"></div>
+      <div class="form-group"><label>Shoulders (1-10)</label><input type="number" id="f-shoulders" placeholder="e.g. 5" min="1" max="10"></div>
+      <div class="form-group"><label>Lower Back (1-10)</label><input type="number" id="f-back" placeholder="e.g. 6" min="1" max="10"></div>
+      <div class="form-group"><label>Overall Score (1-10)</label><input type="number" id="f-overall" placeholder="e.g. 6" min="1" max="10"></div>
+      <div class="form-group"><label>Notes</label><input type="text" id="f-notes" placeholder="How do you feel?"></div>
+    </div>
+    <button class="btn" onclick="saveFlexibility()">Save Measurement</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Flexibility Progress</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Hamstrings</th><th>Hips</th><th>Shoulders</th><th>Lower Back</th><th>Overall</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="flex-tbody"><tr><td colspan="8"><div class="empty"><div class="empty-icon">🤸</div><p>No measurements yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- POSES -->
+<div class="content" id="tab-poses">
+  <div class="card">
+    <div class="card-title">Pose Library — 35 Essential Poses</div>
+    <div id="pose-library"></div>
+  </div>
+</div>
+
+<!-- GOALS -->
+<div class="content" id="tab-goals">
+  <div class="card">
+    <div class="card-title">Set Your Yoga Goals</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Sessions per Week</label><input type="number" id="g-sessions" placeholder="e.g. 4"></div>
+      <div class="form-group"><label>Minutes per Session</label><input type="number" id="g-minutes" placeholder="e.g. 45"></div>
+      <div class="form-group"><label>Flexibility Goal (1-10)</label><input type="number" id="g-flex" placeholder="e.g. 8"></div>
+      <div class="form-group" style="grid-column:1/-1"><label>Main Goal</label><input type="text" id="g-goal" placeholder="e.g. Touch my toes, do a split, improve back pain..."></div>
+    </div>
+    <button class="btn" onclick="saveGoals()">Save Goals</button>
+  </div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<div class="content" id="tab-instructions">
+  <div class="card">
+    <div class="card-title">How to Use Your Yoga Tracker</div>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><h4>Log Every Session</h4><p>After each yoga session, go to Session Log and record the style, duration, and how you felt.</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><h4>Track Flexibility Monthly</h4><p>Once a month, go to Flexibility and rate your flexibility in each body area to track your progress over time.</p></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><h4>Explore the Pose Library</h4><p>The Pose Library has 35 essential yoga poses organized by category with descriptions.</p></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><h4>Set Your Goals</h4><p>Go to Goals and set your weekly session target and flexibility goal to stay motivated.</p></div></div>
+  </div>
+  <div class="card" style="background:var(--orange);color:var(--white);">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--orange);margin-bottom:8px;">DIGITAL FITNESS HUB</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.8);">Questions? Contact us through Etsy. We respond within 24 hours.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const K={sessions:'dfh_yg_sessions',flex:'dfh_yg_flex',goals:'dfh_yg_goals'};
+const POSES=[
+  {name:'Downward Dog',cat:'Foundation',diff:'Beginner',desc:'Inverted V-shape, hands and feet on mat, hips high'},
+  {name:"Child's Pose",cat:'Restorative',diff:'Beginner',desc:'Knees wide, arms extended forward, forehead on mat'},
+  {name:'Warrior I',cat:'Standing',diff:'Beginner',desc:'Front knee bent 90°, back leg straight, arms raised overhead'},
+  {name:'Warrior II',cat:'Standing',diff:'Beginner',desc:'Arms parallel to floor, front knee bent, gaze over front hand'},
+  {name:'Warrior III',cat:'Balancing',diff:'Intermediate',desc:'Balance on one leg, body parallel to floor, arms extended'},
+  {name:'Tree Pose',cat:'Balancing',diff:'Beginner',desc:'One foot on inner thigh, hands at heart or overhead'},
+  {name:'Triangle Pose',cat:'Standing',diff:'Beginner',desc:'Feet wide, reach forward then down, one arm up'},
+  {name:'Pigeon Pose',cat:'Hip Opener',diff:'Intermediate',desc:'Front knee bent, back leg extended, deep hip stretch'},
+  {name:'Cobra Pose',cat:'Backbend',diff:'Beginner',desc:'Prone, hands under shoulders, press chest up'},
+  {name:'Upward Dog',cat:'Backbend',diff:'Beginner',desc:'Similar to cobra but arms fully extended, thighs off mat'},
+  {name:'Bridge Pose',cat:'Backbend',diff:'Beginner',desc:'Supine, feet flat, hips lifted, hands clasped under body'},
+  {name:'Wheel Pose',cat:'Backbend',diff:'Advanced',desc:'Full backbend, hands and feet on floor, body arched'},
+  {name:'Seated Forward Fold',cat:'Forward Fold',diff:'Beginner',desc:'Legs extended, fold forward reaching toward feet'},
+  {name:'Standing Forward Fold',cat:'Forward Fold',diff:'Beginner',desc:'Standing, hinge at hips, hands toward floor'},
+  {name:'Happy Baby',cat:'Restorative',diff:'Beginner',desc:'On back, hold outer edges of feet, knees wide'},
+  {name:'Legs Up the Wall',cat:'Restorative',diff:'Beginner',desc:'Supine, legs extended up wall, restorative inversion'},
+  {name:'Corpse Pose (Savasana)',cat:'Restorative',diff:'Beginner',desc:'Flat on back, arms relaxed, complete stillness'},
+  {name:'Low Lunge',cat:'Hip Opener',diff:'Beginner',desc:'Front knee over ankle, back knee down, hips forward'},
+  {name:'Lizard Pose',cat:'Hip Opener',diff:'Intermediate',desc:'Low lunge with front foot outside hand, deep hip flexor stretch'},
+  {name:'Butterfly Pose',cat:'Hip Opener',diff:'Beginner',desc:'Seated, soles of feet together, knees wide, fold forward'},
+  {name:'Half Pigeon',cat:'Hip Opener',diff:'Intermediate',desc:'Modified pigeon, one shin across mat, fold over front leg'},
+  {name:'Cat-Cow',cat:'Spinal Mobility',diff:'Beginner',desc:'On all fours, alternate arching and rounding the spine'},
+  {name:'Sphinx Pose',cat:'Backbend',diff:'Beginner',desc:'Prone, forearms on mat, gentle backbend opening chest'},
+  {name:'Camel Pose',cat:'Backbend',diff:'Intermediate',desc:'Kneeling, hands to heels, chest and hips forward'},
+  {name:'Shoulder Stand',cat:'Inversion',diff:'Intermediate',desc:'On shoulders, legs extended overhead, supported inversion'},
+  {name:'Headstand',cat:'Inversion',diff:'Advanced',desc:'Weight on head and forearms, legs overhead, core engaged'},
+  {name:'Crow Pose',cat:'Arm Balance',diff:'Intermediate',desc:'Hands on floor, knees resting on upper arms, lift feet'},
+  {name:'Side Plank',cat:'Core',diff:'Intermediate',desc:'One hand on floor, body in straight diagonal line, arm up'},
+  {name:'Boat Pose',cat:'Core',diff:'Intermediate',desc:'Seated, lift legs and torso, V-shape balance on sit bones'},
+  {name:'Eagle Pose',cat:'Balancing',diff:'Intermediate',desc:'Standing balance, arms and legs wrapped, deep squat'},
+  {name:'Dancer Pose',cat:'Balancing',diff:'Intermediate',desc:'Standing, hold back foot, kick back while leaning forward'},
+  {name:'Half Moon',cat:'Balancing',diff:'Intermediate',desc:'One hand on floor, one leg extended back, one arm up'},
+  {name:'Wide Leg Forward Fold',cat:'Forward Fold',diff:'Beginner',desc:'Feet wide, fold forward, hands to floor between feet'},
+  {name:'Reclining Twist',cat:'Spinal Mobility',diff:'Beginner',desc:'On back, one knee across body, arms wide, gentle spinal twist'},
+  {name:'Fish Pose',cat:'Backbend',diff:'Beginner',desc:'On back, chest lifted, head tilted back, heart opener'},
+];
+function load(k){try{return JSON.parse(localStorage.getItem(k))||[];}catch{return[];}}
+function save(k,d){localStorage.setItem(k,JSON.stringify(d));}
+function showTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');document.getElementById('tab-'+name).classList.add('active');
+  if(name==='dashboard')renderDashboard();
+  if(name==='log')renderLog();
+  if(name==='flexibility')renderFlex();
+  if(name==='poses')renderPoses();
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function saveSession(){
+  const date=document.getElementById('l-date').value;
+  if(!date){showToast('Please enter a date');return;}
+  const sessions=load(K.sessions);
+  sessions.unshift({date,style:document.getElementById('l-style').value,duration:parseInt(document.getElementById('l-duration').value)||0,feel:document.getElementById('l-feel').value||'',instructor:document.getElementById('l-instructor').value||'',notes:document.getElementById('l-notes').value||''});
+  save(K.sessions,sessions);clearSession();renderLog();renderDashboard();showToast('✓ Session saved!');
+}
+function clearSession(){['l-date','l-duration','l-feel','l-instructor','l-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('l-date').value=new Date().toISOString().split('T')[0];}
+function deleteSession(i){const s=load(K.sessions);s.splice(i,1);save(K.sessions,s);renderLog();renderDashboard();}
+function renderLog(){
+  const sessions=load(K.sessions);
+  const tbody=document.getElementById('log-tbody');
+  if(!sessions.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">📝</div><p>No sessions yet</p></div></td></tr>';return;}
+  tbody.innerHTML=sessions.map((s,i)=>`<tr><td>${s.date}</td><td>${s.style}</td><td>${s.duration} min</td><td>${s.feel||'—'}/10</td><td>${s.instructor||'—'}</td><td>${s.notes||'—'}</td><td><button class="delete-btn" onclick="deleteSession(${i})">✕</button></td></tr>`).join('');
+}
+function saveFlexibility(){
+  const date=document.getElementById('f-date').value;
+  if(!date){showToast('Please enter a date');return;}
+  const entries=load(K.flex);
+  entries.unshift({date,hamstrings:document.getElementById('f-hamstrings').value||'',hips:document.getElementById('f-hips').value||'',shoulders:document.getElementById('f-shoulders').value||'',back:document.getElementById('f-back').value||'',overall:document.getElementById('f-overall').value||'',notes:document.getElementById('f-notes').value||''});
+  save(K.flex,entries);
+  ['f-date','f-hamstrings','f-hips','f-shoulders','f-back','f-overall','f-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  renderFlex();showToast('✓ Measurement saved!');
+}
+function deleteFlex(i){const e=load(K.flex);e.splice(i,1);save(K.flex,e);renderFlex();}
+function renderFlex(){
+  const entries=load(K.flex);
+  const tbody=document.getElementById('flex-tbody');
+  if(!entries.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty"><div class="empty-icon">🤸</div><p>No measurements yet</p></div></td></tr>';return;}
+  tbody.innerHTML=entries.map((e,i)=>`<tr><td>${e.date}</td><td>${e.hamstrings||'—'}/10</td><td>${e.hips||'—'}/10</td><td>${e.shoulders||'—'}/10</td><td>${e.back||'—'}/10</td><td><strong>${e.overall||'—'}/10</strong></td><td>${e.notes||'—'}</td><td><button class="delete-btn" onclick="deleteFlex(${i})">✕</button></td></tr>`).join('');
+}
+function renderPoses(){
+  const cats={};POSES.forEach(p=>{if(!cats[p.cat])cats[p.cat]=[];cats[p.cat].push(p);});
+  document.getElementById('pose-library').innerHTML=Object.entries(cats).map(([cat,poses])=>`
+    <div style="margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--orange);text-transform:uppercase;margin-bottom:10px;">${cat}</div>
+      ${poses.map(p=>`<div class="pose-card"><div class="pose-name">${p.name}</div><div class="pose-meta">Difficulty: ${p.diff} — ${p.desc}</div></div>`).join('')}
+    </div>`).join('');
+}
+function saveGoals(){showToast('✓ Goals saved!');}
+function renderDashboard(){
+  const sessions=load(K.sessions);
+  document.getElementById('kpi-sessions').textContent=sessions.length;
+  const now=new Date();
+  const monthSessions=sessions.filter(s=>{const d=new Date(s.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();});
+  document.getElementById('kpi-month').textContent=monthSessions.length;
+  const totalMins=sessions.reduce((s,sess)=>s+(sess.duration||0),0);
+  document.getElementById('kpi-minutes').textContent=totalMins;
+  const feels=sessions.filter(s=>s.feel).map(s=>parseFloat(s.feel));
+  document.getElementById('kpi-feel').textContent=feels.length?((feels.reduce((a,b)=>a+b,0)/feels.length).toFixed(1)):'—';
+  const recent=sessions.slice(0,7);
+  document.getElementById('dashboard-tbody').innerHTML=recent.length?recent.map(s=>`<tr><td>${s.date}</td><td>${s.style}</td><td>${s.duration} min</td><td>${s.feel||'—'}/10</td><td>${s.notes||'—'}</td></tr>`).join(''):'<tr><td colspan="5"><div class="empty"><div class="empty-icon">🧘</div><p>No sessions yet</p></div></td></tr>';
+}
+document.getElementById('l-date').value=new Date().toISOString().split('T')[0];
+document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+renderDashboard();
+</script>
+</body>
+</html>

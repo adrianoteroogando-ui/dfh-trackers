@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Workout Log & Gym Tracker — Digital Fitness Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#EDE8E2;--orange:#E8622A;--black:#1C1C1C;--white:#FFFFFF;--gray:#5A5550;--light:#F4F1ED;--border:#CCC6BE;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--black);min-height:100vh;}
+  .header{background:var(--cream);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--orange);}
+  .header-brand{font-size:11px;font-weight:600;color:var(--orange);letter-spacing:2px;text-transform:uppercase;}
+  .header-title{font-size:20px;font-weight:800;color:var(--black);}
+  .header-right{font-size:11px;color:var(--gray);}
+  .tabs{background:var(--white);border-bottom:2px solid var(--border);padding:0 32px;display:flex;overflow-x:auto;}
+  .tab{padding:14px 20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;}
+  .tab:hover{color:var(--black);}
+  .tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+  .content{display:none;padding:32px;max-width:1100px;margin:0 auto;}
+  .content.active{display:block;}
+  .card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:24px;}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+  .kpi{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--orange);}
+  .kpi-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .kpi-value{font-size:28px;font-weight:800;color:var(--black);}
+  .kpi-unit{font-size:12px;color:var(--gray);margin-top:2px;}
+  .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);}
+  .form-group input,.form-group select{padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--black);background:var(--cream);}
+  .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--orange);}
+  .btn{background:var(--orange);color:var(--white);border:none;padding:12px 28px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:16px;}
+  .btn:hover{opacity:.85;}
+  .btn-secondary{background:transparent;color:var(--orange);border:2px solid var(--orange);margin-left:8px;}
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th{background:var(--orange);color:var(--white);padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:left;}
+  td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);}
+  tr:nth-child(even) td{background:var(--light);}
+  tr:hover td{background:#E4DED7;}
+  .delete-btn{color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;background:none;border:none;}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--black);color:var(--white);padding:14px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(20px);transition:all .3s;z-index:999;border-left:4px solid var(--orange);}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .step{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start;}
+  .step-num{background:var(--orange);color:var(--white);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+  .step-text h4{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .step-text p{font-size:13px;color:var(--gray);line-height:1.5;}
+  .empty{text-align:center;padding:40px;color:var(--gray);}
+  .empty-icon{font-size:40px;margin-bottom:12px;}
+  .pr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .pr-card{background:var(--cream);border-radius:8px;padding:16px;border-left:3px solid var(--orange);}
+  .pr-exercise{font-size:12px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+  .pr-value{font-size:22px;font-weight:800;color:var(--black);}
+  .pr-unit{font-size:11px;color:var(--gray);}
+  @media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}.pr-grid{grid-template-columns:repeat(2,1fr);}.header{padding:12px 16px;}.content{padding:16px;}.tabs{padding:0 16px;}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="header-brand">Digital Fitness Hub</div>
+    <div class="header-title">Workout Log & Gym Tracker</div>
+  </div>
+  <div class="header-right">Your data is saved locally on your device</div>
+</div>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('dashboard',this)">Dashboard</div>
+  <div class="tab" onclick="showTab('log',this)">Workout Log</div>
+  <div class="tab" onclick="showTab('prs',this)">Personal Records</div>
+  <div class="tab" onclick="showTab('library',this)">Exercise Library</div>
+  <div class="tab" onclick="showTab('instructions',this)">Instructions</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="content active" id="tab-dashboard">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Total Workouts</div><div class="kpi-value" id="kpi-total">0</div><div class="kpi-unit">sessions logged</div></div>
+    <div class="kpi"><div class="kpi-label">This Week</div><div class="kpi-value" id="kpi-week">0</div><div class="kpi-unit">workouts</div></div>
+    <div class="kpi"><div class="kpi-label">Total Volume</div><div class="kpi-value" id="kpi-volume">0</div><div class="kpi-unit">lbs/kg lifted</div></div>
+    <div class="kpi"><div class="kpi-label">Fav Exercise</div><div class="kpi-value" id="kpi-fav" style="font-size:16px;">—</div><div class="kpi-unit">most logged</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Recent Workouts</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Exercise</th><th>Sets</th><th>Reps</th><th>Weight</th><th>Notes</th></tr></thead>
+      <tbody id="dashboard-tbody"><tr><td colspan="6"><div class="empty"><div class="empty-icon">🏋️</div><p>No workouts yet — start logging!</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- WORKOUT LOG -->
+<div class="content" id="tab-log">
+  <div class="card">
+    <div class="card-title">Log a Set</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" id="l-date"></div>
+      <div class="form-group"><label>Exercise</label><input type="text" id="l-exercise" placeholder="e.g. Barbell Squat" list="exercise-list"></div>
+      <div class="form-group"><label>Muscle Group</label><select id="l-muscle"><option>Chest</option><option>Back</option><option>Legs</option><option>Shoulders</option><option>Arms</option><option>Core</option><option>Full Body</option><option>Cardio</option></select></div>
+      <div class="form-group"><label>Sets</label><input type="number" id="l-sets" placeholder="e.g. 4"></div>
+      <div class="form-group"><label>Reps</label><input type="number" id="l-reps" placeholder="e.g. 8"></div>
+      <div class="form-group"><label>Weight (lbs/kg)</label><input type="number" step="0.5" id="l-weight" placeholder="e.g. 135"></div>
+      <div class="form-group"><label>Notes</label><input type="text" id="l-notes" placeholder="How did it feel?"></div>
+    </div>
+    <datalist id="exercise-list">
+      <option>Barbell Squat</option><option>Deadlift</option><option>Bench Press</option><option>Pull-Up</option>
+      <option>Overhead Press</option><option>Barbell Row</option><option>Leg Press</option><option>Hip Thrust</option>
+      <option>Romanian Deadlift</option><option>Incline Press</option><option>Cable Row</option><option>Lat Pulldown</option>
+    </datalist>
+    <button class="btn" onclick="saveLog()">Save Set</button>
+    <button class="btn btn-secondary" onclick="clearLog()">Clear</button>
+  </div>
+  <div class="card">
+    <div class="card-title">All Workout Sets</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Exercise</th><th>Muscle</th><th>Sets</th><th>Reps</th><th>Weight</th><th>Volume</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="log-tbody"><tr><td colspan="9"><div class="empty"><div class="empty-icon">📝</div><p>No sets logged yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- PERSONAL RECORDS -->
+<div class="content" id="tab-prs">
+  <div class="card">
+    <div class="card-title">Your Personal Records</div>
+    <p style="font-size:13px;color:var(--gray);margin-bottom:16px;">Auto-calculated from your workout log — shows your heaviest weight lifted for each exercise.</p>
+    <div class="pr-grid" id="pr-grid">
+      <div class="empty" style="grid-column:1/-1"><div class="empty-icon">🏆</div><p>Log workouts to see your PRs here</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- EXERCISE LIBRARY -->
+<div class="content" id="tab-library">
+  <div class="card">
+    <div class="card-title">Exercise Library</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Exercise</th><th>Muscle Group</th><th>Type</th><th>Form Cues</th></tr></thead>
+        <tbody>
+          <tr><td>Barbell Squat</td><td>Legs</td><td>Compound</td><td>Bar on upper traps, knees track toes, squat to parallel, chest up</td></tr>
+          <tr><td>Deadlift</td><td>Back / Legs</td><td>Compound</td><td>Neutral spine, bar over mid-foot, drive hips and heels, lock out at top</td></tr>
+          <tr><td>Bench Press</td><td>Chest</td><td>Compound</td><td>5-point contact, bar touches lower chest, elbows ~45°</td></tr>
+          <tr><td>Pull-Up</td><td>Back</td><td>Compound</td><td>Dead hang start, drive elbows down, chin clears bar</td></tr>
+          <tr><td>Overhead Press</td><td>Shoulders</td><td>Compound</td><td>Bar at collarbone, press straight up, squeeze glutes</td></tr>
+          <tr><td>Barbell Row</td><td>Back</td><td>Compound</td><td>Hinge at hips, pull bar to lower chest, squeeze shoulder blades</td></tr>
+          <tr><td>Romanian Deadlift</td><td>Hamstrings</td><td>Compound</td><td>Soft knee bend, hinge at hips, bar stays close to legs</td></tr>
+          <tr><td>Hip Thrust</td><td>Glutes</td><td>Isolation</td><td>Shoulder on bench edge, drive hips up, squeeze hard at top</td></tr>
+          <tr><td>Incline Bench Press</td><td>Upper Chest</td><td>Compound</td><td>30-45° incline, same form as flat bench, upper chest focus</td></tr>
+          <tr><td>Lat Pulldown</td><td>Back</td><td>Compound</td><td>Pull to upper chest, elbows point down, lean back slightly</td></tr>
+          <tr><td>Cable Row</td><td>Back</td><td>Compound</td><td>Sit tall, pull to belly button, squeeze shoulder blades at end</td></tr>
+          <tr><td>Leg Press</td><td>Legs</td><td>Compound</td><td>Feet shoulder-width, don't lock knees, full range of motion</td></tr>
+          <tr><td>Dumbbell Curl</td><td>Biceps</td><td>Isolation</td><td>Keep elbows fixed, full extension, supinate at top</td></tr>
+          <tr><td>Tricep Pushdown</td><td>Triceps</td><td>Isolation</td><td>Elbows at sides, full extension, control on way back</td></tr>
+          <tr><td>Lateral Raise</td><td>Shoulders</td><td>Isolation</td><td>Slight forward lean, raise to shoulder height, slight bend in elbow</td></tr>
+          <tr><td>Face Pull</td><td>Rear Delts</td><td>Isolation</td><td>Pull to forehead, elbows high, external rotation at end</td></tr>
+          <tr><td>Plank</td><td>Core</td><td>Isometric</td><td>Straight line head to heels, squeeze everything, breathe</td></tr>
+          <tr><td>Leg Curl</td><td>Hamstrings</td><td>Isolation</td><td>Full range, slow on the way back, no swinging</td></tr>
+          <tr><td>Leg Extension</td><td>Quads</td><td>Isolation</td><td>Full extension, squeeze at top, controlled eccentric</td></tr>
+          <tr><td>Calf Raise</td><td>Calves</td><td>Isolation</td><td>Full stretch at bottom, full contraction at top, pause</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<div class="content" id="tab-instructions">
+  <div class="card">
+    <div class="card-title">How to Use Your Workout Tracker</div>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><h4>Log Every Set</h4><p>Go to Workout Log and log each set as you go in the gym. Enter exercise, sets, reps, and weight.</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><h4>Track Progressive Overload</h4><p>Each session, try to beat your last weight or reps. Your PRs tab shows your best lifts automatically.</p></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><h4>Check Your PRs</h4><p>The Personal Records tab auto-calculates your heaviest lift for every exercise — no manual tracking needed.</p></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><h4>Use the Exercise Library</h4><p>The library has 20 exercises with form cues. Use it as a reference before or during your workout.</p></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-text"><h4>Your Data is Safe</h4><p>All data is saved locally on your device. It never leaves your computer and stays completely private.</p></div></div>
+  </div>
+  <div class="card" style="background:var(--orange);color:var(--white);">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--orange);margin-bottom:8px;">DIGITAL FITNESS HUB</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.8);">Questions? Contact us through Etsy. We respond within 24 hours.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const K={log:'dfh_wl_log'};
+function load(k){try{return JSON.parse(localStorage.getItem(k))||[];}catch{return[];}}
+function save(k,d){localStorage.setItem(k,JSON.stringify(d));}
+function showTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='dashboard')renderDashboard();
+  if(name==='log')renderLog();
+  if(name==='prs')renderPRs();
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function saveLog(){
+  const date=document.getElementById('l-date').value;
+  const exercise=document.getElementById('l-exercise').value;
+  if(!date||!exercise){showToast('Please enter date and exercise');return;}
+  const sets=document.getElementById('l-sets').value;
+  const reps=document.getElementById('l-reps').value;
+  const weight=document.getElementById('l-weight').value;
+  const entries=load(K.log);
+  const volume=(parseFloat(sets)||1)*(parseFloat(reps)||1)*(parseFloat(weight)||0);
+  entries.unshift({date,exercise,muscle:document.getElementById('l-muscle').value,sets:sets||'',reps:reps||'',weight:parseFloat(weight)||0,volume,notes:document.getElementById('l-notes').value||''});
+  save(K.log,entries);clearLog();renderLog();renderDashboard();showToast('✓ Set saved!');
+}
+function clearLog(){['l-date','l-exercise','l-sets','l-reps','l-weight','l-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('l-date').value=new Date().toISOString().split('T')[0];}
+function deleteLog(i){const e=load(K.log);e.splice(i,1);save(K.log,e);renderLog();renderDashboard();renderPRs();showToast('Deleted');}
+function renderLog(){
+  const entries=load(K.log);
+  const tbody=document.getElementById('log-tbody');
+  if(!entries.length){tbody.innerHTML='<tr><td colspan="9"><div class="empty"><div class="empty-icon">📝</div><p>No sets logged yet</p></div></td></tr>';return;}
+  tbody.innerHTML=entries.map((e,i)=>`<tr><td>${e.date}</td><td><strong>${e.exercise}</strong></td><td>${e.muscle}</td><td>${e.sets||'—'}</td><td>${e.reps||'—'}</td><td>${e.weight||'—'}</td><td>${e.volume?e.volume.toLocaleString():'—'}</td><td>${e.notes||'—'}</td><td><button class="delete-btn" onclick="deleteLog(${i})">✕</button></td></tr>`).join('');
+}
+function renderDashboard(){
+  const entries=load(K.log);
+  document.getElementById('kpi-total').textContent=new Set(entries.map(e=>e.date)).size;
+  const weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);
+  const thisWeek=entries.filter(e=>new Date(e.date)>=weekAgo);
+  document.getElementById('kpi-week').textContent=new Set(thisWeek.map(e=>e.date)).size;
+  const totalVolume=entries.reduce((s,e)=>s+(e.volume||0),0);
+  document.getElementById('kpi-volume').textContent=totalVolume>0?totalVolume.toLocaleString():'0';
+  const freq={};entries.forEach(e=>{freq[e.exercise]=(freq[e.exercise]||0)+1;});
+  const fav=Object.entries(freq).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('kpi-fav').textContent=fav?fav[0]:'—';
+  const recent=entries.slice(0,10);
+  document.getElementById('dashboard-tbody').innerHTML=recent.length?recent.map(e=>`<tr><td>${e.date}</td><td><strong>${e.exercise}</strong></td><td>${e.sets||'—'}</td><td>${e.reps||'—'}</td><td>${e.weight||'—'}</td><td>${e.notes||'—'}</td></tr>`).join(''):'<tr><td colspan="6"><div class="empty"><div class="empty-icon">🏋️</div><p>No workouts yet</p></div></td></tr>';
+}
+function renderPRs(){
+  const entries=load(K.log);
+  const prs={};
+  entries.forEach(e=>{if(!prs[e.exercise]||e.weight>prs[e.exercise])prs[e.exercise]=e.weight;});
+  const grid=document.getElementById('pr-grid');
+  const prList=Object.entries(prs).sort((a,b)=>b[1]-a[1]);
+  if(!prList.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🏆</div><p>Log workouts to see your PRs here</p></div>';return;}
+  grid.innerHTML=prList.map(([ex,w])=>`<div class="pr-card"><div class="pr-exercise">${ex}</div><div class="pr-value">${w}</div><div class="pr-unit">lbs/kg PR</div></div>`).join('');
+}
+document.getElementById('l-date').value=new Date().toISOString().split('T')[0];
+renderDashboard();
+</script>
+</body>
+</html>

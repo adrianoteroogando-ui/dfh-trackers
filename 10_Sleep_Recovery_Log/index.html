@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sleep & Recovery Log — Digital Fitness Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#EDE8E2;--orange:#E8622A;--black:#1C1C1C;--white:#FFFFFF;--gray:#5A5550;--light:#F4F1ED;--border:#CCC6BE;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--black);min-height:100vh;}
+  .header{background:var(--cream);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--orange);}
+  .header-brand{font-size:11px;font-weight:600;color:var(--orange);letter-spacing:2px;text-transform:uppercase;}
+  .header-title{font-size:20px;font-weight:800;color:var(--black);}
+  .header-right{font-size:11px;color:var(--gray);}
+  .tabs{background:var(--white);border-bottom:2px solid var(--border);padding:0 32px;display:flex;overflow-x:auto;}
+  .tab{padding:14px 20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;}
+  .tab:hover{color:var(--black);}
+  .tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+  .content{display:none;padding:32px;max-width:1100px;margin:0 auto;}
+  .content.active{display:block;}
+  .card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:24px;}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+  .kpi{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--orange);}
+  .kpi-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .kpi-value{font-size:28px;font-weight:800;color:var(--black);}
+  .kpi-unit{font-size:12px;color:var(--gray);margin-top:2px;}
+  .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);}
+  .form-group input,.form-group select,.form-group textarea{padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--black);background:var(--cream);transition:border-color .2s;}
+  .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--orange);}
+  .btn{background:var(--orange);color:var(--white);border:none;padding:12px 28px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:16px;}
+  .btn:hover{opacity:.85;}
+  .btn-secondary{background:transparent;color:var(--orange);border:2px solid var(--orange);margin-left:8px;}
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th{background:var(--orange);color:var(--white);padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:left;}
+  td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);}
+  tr:nth-child(even) td{background:var(--light);}
+  tr:hover td{background:#E4DED7;}
+  .delete-btn{color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;background:none;border:none;}
+  .progress-bar-wrap{background:var(--border);border-radius:99px;height:10px;overflow:hidden;margin-top:8px;}
+  .progress-bar{background:var(--orange);height:100%;border-radius:99px;transition:width .5s;}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--black);color:var(--white);padding:14px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(20px);transition:all .3s;z-index:999;border-left:4px solid var(--orange);}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .step{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start;}
+  .step-num{background:var(--orange);color:var(--white);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+  .step-text h4{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .step-text p{font-size:13px;color:var(--gray);line-height:1.5;}
+  .empty{text-align:center;padding:40px;color:var(--gray);}
+  .empty-icon{font-size:40px;margin-bottom:12px;}
+  .goal-item{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border);}
+  .goal-item:last-child{border-bottom:none;}
+  .chart-area{height:200px;display:flex;align-items:flex-end;gap:4px;padding:16px 0 0;}
+  .chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;}
+  .chart-bar{width:100%;background:var(--orange);border-radius:4px 4px 0 0;min-height:4px;transition:height .5s;}
+  .chart-label{font-size:9px;color:var(--gray);text-align:center;}
+  .chart-value{font-size:10px;font-weight:600;color:var(--black);}
+  .quality-badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;}
+  .q-excellent{background:#d4edda;color:#155724;}
+  .q-good{background:#d1ecf1;color:#0c5460;}
+  .q-fair{background:#fff3cd;color:#856404;}
+  .q-poor{background:#f8d7da;color:#721c24;}
+  @media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}.header{padding:12px 16px;}.content{padding:16px;}.tabs{padding:0 16px;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-brand">Digital Fitness Hub</div>
+    <div class="header-title">Sleep & Recovery Log</div>
+  </div>
+  <div class="header-right">Your data is saved locally on your device</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('dashboard',this)">Dashboard</div>
+  <div class="tab" onclick="showTab('sleep',this)">Sleep Log</div>
+  <div class="tab" onclick="showTab('recovery',this)">Recovery</div>
+  <div class="tab" onclick="showTab('goals',this)">Goals</div>
+  <div class="tab" onclick="showTab('chart',this)">Progress Chart</div>
+  <div class="tab" onclick="showTab('instructions',this)">Instructions</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="content active" id="tab-dashboard">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Avg Sleep Hours</div><div class="kpi-value" id="kpi-avg">—</div><div class="kpi-unit">last 7 nights</div></div>
+    <div class="kpi"><div class="kpi-label">Quality Score</div><div class="kpi-value" id="kpi-quality">—</div><div class="kpi-unit">avg (1–10)</div></div>
+    <div class="kpi"><div class="kpi-label">Avg Energy</div><div class="kpi-value" id="kpi-energy">—</div><div class="kpi-unit">avg (1–10)</div></div>
+    <div class="kpi"><div class="kpi-label">Nights Logged</div><div class="kpi-value" id="kpi-days">0</div><div class="kpi-unit">total entries</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Sleep Goal Progress</div>
+    <div id="progress-label" style="font-size:13px;color:var(--gray);margin-bottom:6px;">Set your sleep hour goal in the Goals tab</div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Recent Sleep Entries</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Bedtime</th><th>Wake Up</th><th>Hours</th><th>Quality</th><th>Energy</th><th>Notes</th></tr></thead>
+      <tbody id="dashboard-tbody"><tr><td colspan="7"><div class="empty"><div class="empty-icon">🌙</div><p>No entries yet — start logging in the Sleep Log tab</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- SLEEP LOG -->
+<div class="content" id="tab-sleep">
+  <div class="card">
+    <div class="card-title">Log Last Night's Sleep</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date (Night of)</label><input type="date" id="s-date"></div>
+      <div class="form-group"><label>Bedtime</label><input type="time" id="s-bedtime" placeholder="e.g. 22:30"></div>
+      <div class="form-group"><label>Wake Up Time</label><input type="time" id="s-wake" placeholder="e.g. 06:30"></div>
+      <div class="form-group">
+        <label>Sleep Quality (1–10)</label>
+        <select id="s-quality">
+          <option value="">Select...</option>
+          <option value="10">10 — Perfect</option>
+          <option value="9">9 — Excellent</option>
+          <option value="8">8 — Very Good</option>
+          <option value="7">7 — Good</option>
+          <option value="6">6 — Decent</option>
+          <option value="5">5 — Average</option>
+          <option value="4">4 — Below Average</option>
+          <option value="3">3 — Poor</option>
+          <option value="2">2 — Very Poor</option>
+          <option value="1">1 — Terrible</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Morning Energy (1–10)</label>
+        <select id="s-energy">
+          <option value="">Select...</option>
+          <option value="10">10 — Fully Energized</option>
+          <option value="9">9 — Very Energized</option>
+          <option value="8">8 — Good Energy</option>
+          <option value="7">7 — Decent</option>
+          <option value="6">6 — OK</option>
+          <option value="5">5 — Average</option>
+          <option value="4">4 — Sluggish</option>
+          <option value="3">3 — Tired</option>
+          <option value="2">2 — Very Tired</option>
+          <option value="1">1 — Exhausted</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Notes</label><input type="text" id="s-notes" placeholder="e.g. woke up twice, stress, late coffee"></div>
+    </div>
+    <button class="btn" onclick="saveSleep()">Save Entry</button>
+    <button class="btn btn-secondary" onclick="clearSleep()">Clear</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Sleep Log History</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Bedtime</th><th>Wake Up</th><th>Hours</th><th>Quality</th><th>Energy</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="sleep-tbody"><tr><td colspan="8"><div class="empty"><div class="empty-icon">😴</div><p>No entries yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- RECOVERY -->
+<div class="content" id="tab-recovery">
+  <div class="card">
+    <div class="card-title">Log Recovery Metrics</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" id="r-date"></div>
+      <div class="form-group">
+        <label>Workout Today</label>
+        <select id="r-workout">
+          <option value="">No workout</option>
+          <option value="Light">Light</option>
+          <option value="Moderate">Moderate</option>
+          <option value="Intense">Intense</option>
+          <option value="Rest Day">Rest Day</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Muscle Soreness (1–10)</label>
+        <select id="r-soreness">
+          <option value="">Select...</option>
+          <option value="1">1 — None</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5 — Moderate</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+          <option value="9">9</option>
+          <option value="10">10 — Severe</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Resting Heart Rate (bpm)</label><input type="number" id="r-hr" placeholder="e.g. 58"></div>
+      <div class="form-group"><label>Water Intake (L)</label><input type="number" step="0.1" id="r-water" placeholder="e.g. 2.5"></div>
+      <div class="form-group"><label>Notes</label><input type="text" id="r-notes" placeholder="e.g. stretched, ice bath, protein"></div>
+    </div>
+    <button class="btn" onclick="saveRecovery()">Save Recovery</button>
+    <button class="btn btn-secondary" onclick="clearRecovery()">Clear</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Recovery History</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Workout</th><th>Soreness</th><th>Resting HR</th><th>Water</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="recovery-tbody"><tr><td colspan="7"><div class="empty"><div class="empty-icon">💪</div><p>No recovery entries yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- GOALS -->
+<div class="content" id="tab-goals">
+  <div class="card">
+    <div class="card-title">Set Your Sleep Goals</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Target Sleep Hours/Night</label><input type="number" step="0.5" id="g-hours" placeholder="e.g. 8"></div>
+      <div class="form-group"><label>Target Bedtime</label><input type="time" id="g-bedtime"></div>
+      <div class="form-group"><label>Target Wake Up</label><input type="time" id="g-wake"></div>
+      <div class="form-group"><label>Quality Goal (1–10)</label><input type="number" min="1" max="10" id="g-quality" placeholder="e.g. 8"></div>
+      <div class="form-group"><label>Energy Goal (1–10)</label><input type="number" min="1" max="10" id="g-energy" placeholder="e.g. 7"></div>
+      <div class="form-group"><label>Start Date</label><input type="date" id="g-startdate"></div>
+    </div>
+    <button class="btn" onclick="saveGoals()">Save Goals</button>
+  </div>
+  <div class="card" id="goals-summary" style="display:none">
+    <div class="card-title">Goals Summary</div>
+    <div id="goals-display"></div>
+  </div>
+</div>
+
+<!-- CHART -->
+<div class="content" id="tab-chart">
+  <div class="card">
+    <div class="card-title">Sleep Hours — Last 12 Nights</div>
+    <div id="chart-hours"><div class="empty"><div class="empty-icon">📊</div><p>Add at least 2 sleep entries to see your chart</p></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Sleep Quality — Last 12 Nights</div>
+    <div id="chart-quality"><div class="empty"><div class="empty-icon">⭐</div><p>Add at least 2 sleep entries to see your quality chart</p></div></div>
+  </div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<div class="content" id="tab-instructions">
+  <div class="card">
+    <div class="card-title">How to Use Your Sleep & Recovery Log</div>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><h4>Set Your Goals</h4><p>Go to the Goals tab and enter your target sleep hours, bedtime, wake-up time, and quality/energy targets.</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><h4>Log Every Morning</h4><p>Each morning, go to Sleep Log and record the previous night's bedtime, wake-up time, quality rating (1–10), and energy level when you woke up.</p></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><h4>Track Recovery</h4><p>Use the Recovery tab to log workout intensity, muscle soreness, resting heart rate, and water intake. This shows how training affects your sleep.</p></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><h4>Check Your Dashboard</h4><p>The Dashboard calculates your average sleep hours, quality score, and energy level automatically. Use it to spot trends and make adjustments.</p></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-text"><h4>Your Data is Safe</h4><p>All data is saved locally on your device using your browser's storage. It stays completely private and never leaves your computer.</p></div></div>
+  </div>
+  <div class="card" style="background:var(--orange);color:var(--white);">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--orange);margin-bottom:8px;">DIGITAL FITNESS HUB</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.8);">Questions? Contact us through Etsy. We respond within 24 hours.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const K={sleep:'dfh_sl_sleep',recovery:'dfh_sl_recovery',goals:'dfh_sl_goals'};
+function load(k){try{return JSON.parse(localStorage.getItem(k))||[];}catch{return[];}}
+function loadObj(k){try{return JSON.parse(localStorage.getItem(k))||{};}catch{return{};}}
+function save(k,d){localStorage.setItem(k,JSON.stringify(d));}
+function showTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='dashboard')renderDashboard();
+  if(name==='sleep')renderSleep();
+  if(name==='recovery')renderRecovery();
+  if(name==='goals')renderGoals();
+  if(name==='chart')renderChart();
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+function calcHours(bedtime,wake){
+  if(!bedtime||!wake)return null;
+  const [bh,bm]=bedtime.split(':').map(Number);
+  const [wh,wm]=wake.split(':').map(Number);
+  let mins=(wh*60+wm)-(bh*60+bm);
+  if(mins<0)mins+=1440;
+  return Math.round(mins/60*10)/10;
+}
+
+function qualityBadge(q){
+  q=parseInt(q);
+  if(q>=9)return`<span class="quality-badge q-excellent">${q} Excellent</span>`;
+  if(q>=7)return`<span class="quality-badge q-good">${q} Good</span>`;
+  if(q>=5)return`<span class="quality-badge q-fair">${q} Fair</span>`;
+  return`<span class="quality-badge q-poor">${q} Poor</span>`;
+}
+
+function saveSleep(){
+  const date=document.getElementById('s-date').value;
+  const bedtime=document.getElementById('s-bedtime').value;
+  const wake=document.getElementById('s-wake').value;
+  if(!date||!bedtime||!wake){showToast('Please enter date, bedtime and wake-up time');return;}
+  const hours=calcHours(bedtime,wake);
+  const entries=load(K.sleep);
+  entries.unshift({date,bedtime,wake,hours,quality:document.getElementById('s-quality').value||'',energy:document.getElementById('s-energy').value||'',notes:document.getElementById('s-notes').value||''});
+  save(K.sleep,entries);clearSleep();renderSleep();renderDashboard();showToast('✓ Sleep entry saved!');
+}
+function clearSleep(){
+  ['s-date','s-bedtime','s-wake','s-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('s-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('s-quality').value='';
+  document.getElementById('s-energy').value='';
+}
+function deleteSleep(i){const e=load(K.sleep);e.splice(i,1);save(K.sleep,e);renderSleep();renderDashboard();renderChart();showToast('Deleted');}
+function renderSleep(){
+  const entries=load(K.sleep);
+  const tbody=document.getElementById('sleep-tbody');
+  if(!entries.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty"><div class="empty-icon">😴</div><p>No entries yet</p></div></td></tr>';return;}
+  tbody.innerHTML=entries.map((e,i)=>`<tr>
+    <td>${e.date}</td><td>${e.bedtime||'—'}</td><td>${e.wake||'—'}</td>
+    <td><strong>${e.hours||'—'}h</strong></td>
+    <td>${e.quality?qualityBadge(e.quality):'—'}</td>
+    <td>${e.energy||'—'}/10</td><td>${e.notes||'—'}</td>
+    <td><button class="delete-btn" onclick="deleteSleep(${i})">✕</button></td>
+  </tr>`).join('');
+}
+
+function saveRecovery(){
+  const date=document.getElementById('r-date').value;
+  if(!date){showToast('Please enter a date');return;}
+  const entries=load(K.recovery);
+  entries.unshift({date,workout:document.getElementById('r-workout').value||'',soreness:document.getElementById('r-soreness').value||'',hr:document.getElementById('r-hr').value||'',water:document.getElementById('r-water').value||'',notes:document.getElementById('r-notes').value||''});
+  save(K.recovery,entries);clearRecovery();renderRecovery();showToast('✓ Recovery entry saved!');
+}
+function clearRecovery(){
+  ['r-date','r-hr','r-water','r-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('r-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('r-workout').value='';
+  document.getElementById('r-soreness').value='';
+}
+function deleteRecovery(i){const e=load(K.recovery);e.splice(i,1);save(K.recovery,e);renderRecovery();showToast('Deleted');}
+function renderRecovery(){
+  const entries=load(K.recovery);
+  const tbody=document.getElementById('recovery-tbody');
+  if(!entries.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">💪</div><p>No recovery entries yet</p></div></td></tr>';return;}
+  tbody.innerHTML=entries.map((e,i)=>`<tr>
+    <td>${e.date}</td><td>${e.workout||'—'}</td><td>${e.soreness?e.soreness+'/10':'—'}</td>
+    <td>${e.hr?e.hr+' bpm':'—'}</td><td>${e.water?e.water+'L':'—'}</td>
+    <td>${e.notes||'—'}</td><td><button class="delete-btn" onclick="deleteRecovery(${i})">✕</button></td>
+  </tr>`).join('');
+}
+
+function saveGoals(){
+  const g={hours:document.getElementById('g-hours').value,bedtime:document.getElementById('g-bedtime').value,wake:document.getElementById('g-wake').value,quality:document.getElementById('g-quality').value,energy:document.getElementById('g-energy').value,startdate:document.getElementById('g-startdate').value};
+  save(K.goals,g);renderGoals();renderDashboard();showToast('✓ Goals saved!');
+}
+function renderGoals(){
+  const g=loadObj(K.goals);
+  if(g.hours){
+    document.getElementById('g-hours').value=g.hours;
+    document.getElementById('g-bedtime').value=g.bedtime||'';
+    document.getElementById('g-wake').value=g.wake||'';
+    document.getElementById('g-quality').value=g.quality||'';
+    document.getElementById('g-energy').value=g.energy||'';
+    document.getElementById('g-startdate').value=g.startdate||'';
+    document.getElementById('goals-summary').style.display='block';
+    document.getElementById('goals-display').innerHTML=`
+      <div class="goal-item"><span>Target Sleep Hours</span><strong>${g.hours}h per night</strong></div>
+      <div class="goal-item"><span>Target Bedtime</span><strong>${g.bedtime||'—'}</strong></div>
+      <div class="goal-item"><span>Target Wake Up</span><strong>${g.wake||'—'}</strong></div>
+      <div class="goal-item"><span>Quality Goal</span><strong>${g.quality||'—'}/10</strong></div>
+      <div class="goal-item"><span>Energy Goal</span><strong>${g.energy||'—'}/10</strong></div>
+      <div class="goal-item"><span>Start Date</span><strong>${g.startdate||'—'}</strong></div>`;
+  }
+}
+
+function renderDashboard(){
+  const entries=load(K.sleep);
+  const goals=loadObj(K.goals);
+  document.getElementById('kpi-days').textContent=entries.length;
+  if(entries.length>0){
+    const last7=entries.slice(0,7);
+    const withHours=last7.filter(e=>e.hours);
+    const withQuality=last7.filter(e=>e.quality);
+    const withEnergy=last7.filter(e=>e.energy);
+    if(withHours.length){
+      const avg=Math.round(withHours.reduce((s,e)=>s+e.hours,0)/withHours.length*10)/10;
+      document.getElementById('kpi-avg').textContent=avg+'h';
+      if(goals.hours){
+        const pct=Math.min(100,Math.round((avg/parseFloat(goals.hours))*100));
+        document.getElementById('progress-bar').style.width=pct+'%';
+        document.getElementById('progress-label').textContent=`${avg}h avg vs ${goals.hours}h goal — ${pct}% achieved`;
+      }
+    }
+    if(withQuality.length){const avg=Math.round(withQuality.reduce((s,e)=>s+parseInt(e.quality),0)/withQuality.length*10)/10;document.getElementById('kpi-quality').textContent=avg;}
+    if(withEnergy.length){const avg=Math.round(withEnergy.reduce((s,e)=>s+parseInt(e.energy),0)/withEnergy.length*10)/10;document.getElementById('kpi-energy').textContent=avg;}
+    document.getElementById('dashboard-tbody').innerHTML=entries.slice(0,7).map(e=>`<tr>
+      <td>${e.date}</td><td>${e.bedtime||'—'}</td><td>${e.wake||'—'}</td>
+      <td><strong>${e.hours||'—'}h</strong></td>
+      <td>${e.quality?qualityBadge(e.quality):'—'}</td>
+      <td>${e.energy||'—'}/10</td><td>${e.notes||'—'}</td>
+    </tr>`).join('');
+  }
+}
+
+function renderChart(){
+  const entries=load(K.sleep).filter(e=>e.hours).reverse().slice(-12);
+  const qEntries=load(K.sleep).filter(e=>e.quality).reverse().slice(-12);
+
+  const hoursContainer=document.getElementById('chart-hours');
+  if(entries.length<2){hoursContainer.innerHTML='<div class="empty"><div class="empty-icon">📊</div><p>Add at least 2 sleep entries to see your chart</p></div>';}
+  else{
+    const vals=entries.map(e=>e.hours);
+    const maxV=Math.max(...vals),minV=Math.min(...vals),range=maxV-minV||1;
+    hoursContainer.innerHTML=`<div class="chart-area">${entries.map(e=>{
+      const h=Math.max(8,Math.round(((e.hours-minV)/range)*150+20));
+      return`<div class="chart-bar-wrap"><div class="chart-value">${e.hours}h</div><div class="chart-bar" style="height:${h}px"></div><div class="chart-label">${e.date.slice(5)}</div></div>`;
+    }).join('')}</div>`;
+  }
+
+  const qualContainer=document.getElementById('chart-quality');
+  if(qEntries.length<2){qualContainer.innerHTML='<div class="empty"><div class="empty-icon">⭐</div><p>Add at least 2 sleep entries to see your quality chart</p></div>';}
+  else{
+    qualContainer.innerHTML=`<div class="chart-area">${qEntries.map(e=>{
+      const h=Math.max(8,Math.round((parseInt(e.quality)/10)*160));
+      return`<div class="chart-bar-wrap"><div class="chart-value">${e.quality}</div><div class="chart-bar" style="height:${h}px"></div><div class="chart-label">${e.date.slice(5)}</div></div>`;
+    }).join('')}</div>`;
+  }
+}
+
+document.getElementById('s-date').value=new Date().toISOString().split('T')[0];
+document.getElementById('r-date').value=new Date().toISOString().split('T')[0];
+renderDashboard();
+</script>
+</body>
+</html>

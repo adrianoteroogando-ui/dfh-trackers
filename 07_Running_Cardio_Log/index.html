@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Running & Cardio Log — Digital Fitness Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#EDE8E2;--orange:#E8622A;--black:#1C1C1C;--white:#FFFFFF;--gray:#5A5550;--light:#F4F1ED;--border:#CCC6BE;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--black);min-height:100vh;}
+  .header{background:var(--cream);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--orange);}
+  .header-brand{font-size:11px;font-weight:600;color:var(--orange);letter-spacing:2px;text-transform:uppercase;}
+  .header-title{font-size:20px;font-weight:800;color:var(--black);}
+  .header-right{font-size:11px;color:var(--gray);}
+  .tabs{background:var(--white);border-bottom:2px solid var(--border);padding:0 32px;display:flex;overflow-x:auto;}
+  .tab{padding:14px 20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;}
+  .tab:hover{color:var(--black);}
+  .tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+  .content{display:none;padding:32px;max-width:1100px;margin:0 auto;}
+  .content.active{display:block;}
+  .card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:24px;}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+  .kpi{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--orange);}
+  .kpi-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .kpi-value{font-size:28px;font-weight:800;color:var(--black);}
+  .kpi-unit{font-size:12px;color:var(--gray);margin-top:2px;}
+  .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);}
+  .form-group input,.form-group select{padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--black);background:var(--cream);}
+  .form-group input:focus{outline:none;border-color:var(--orange);}
+  .btn{background:var(--orange);color:var(--white);border:none;padding:12px 28px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:16px;}
+  .btn:hover{opacity:.85;}
+  .btn-secondary{background:transparent;color:var(--orange);border:2px solid var(--orange);margin-left:8px;}
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th{background:var(--orange);color:var(--white);padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:left;}
+  td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);}
+  tr:nth-child(even) td{background:var(--light);}
+  .delete-btn{color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;background:none;border:none;}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--black);color:var(--white);padding:14px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(20px);transition:all .3s;z-index:999;border-left:4px solid var(--orange);}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .step{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start;}
+  .step-num{background:var(--orange);color:var(--white);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+  .step-text h4{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .step-text p{font-size:13px;color:var(--gray);line-height:1.5;}
+  .empty{text-align:center;padding:40px;color:var(--gray);}
+  .empty-icon{font-size:40px;margin-bottom:12px;}
+  .hr-zone{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:8px;margin-bottom:8px;}
+  .chart-area{height:180px;display:flex;align-items:flex-end;gap:4px;padding:16px 0 0;}
+  .chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;}
+  .chart-bar{width:100%;background:var(--orange);border-radius:4px 4px 0 0;min-height:4px;}
+  .chart-label{font-size:9px;color:var(--gray);text-align:center;}
+  .chart-value{font-size:10px;font-weight:600;}
+  @media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}.header{padding:12px 16px;}.content{padding:16px;}.tabs{padding:0 16px;}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="header-brand">Digital Fitness Hub</div>
+    <div class="header-title">Running & Cardio Log</div>
+  </div>
+  <div class="header-right">Your data is saved locally on your device</div>
+</div>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('dashboard',this)">Dashboard</div>
+  <div class="tab" onclick="showTab('log',this)">Run Log</div>
+  <div class="tab" onclick="showTab('zones',this)">HR Zones</div>
+  <div class="tab" onclick="showTab('goals',this)">Race Goals</div>
+  <div class="tab" onclick="showTab('chart',this)">Progress Chart</div>
+  <div class="tab" onclick="showTab('instructions',this)">Instructions</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="content active" id="tab-dashboard">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Total Runs</div><div class="kpi-value" id="kpi-runs">0</div><div class="kpi-unit">sessions logged</div></div>
+    <div class="kpi"><div class="kpi-label">Total Distance</div><div class="kpi-value" id="kpi-distance">0</div><div class="kpi-unit">miles / km</div></div>
+    <div class="kpi"><div class="kpi-label">Best Pace</div><div class="kpi-value" id="kpi-pace" style="font-size:18px;">—</div><div class="kpi-unit">min/mile or min/km</div></div>
+    <div class="kpi"><div class="kpi-label">This Week</div><div class="kpi-value" id="kpi-week">0</div><div class="kpi-unit">miles / km</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Recent Runs</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Type</th><th>Distance</th><th>Time</th><th>Pace</th><th>Notes</th></tr></thead>
+      <tbody id="dashboard-tbody"><tr><td colspan="6"><div class="empty"><div class="empty-icon">🏃</div><p>No runs yet — lace up and go!</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- RUN LOG -->
+<div class="content" id="tab-log">
+  <div class="card">
+    <div class="card-title">Log a Run</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" id="r-date"></div>
+      <div class="form-group"><label>Run Type</label><select id="r-type"><option>Easy Run</option><option>Tempo Run</option><option>Long Run</option><option>Interval</option><option>Race</option><option>Recovery</option><option>Trail Run</option></select></div>
+      <div class="form-group"><label>Distance (mi/km)</label><input type="number" step="0.01" id="r-distance" placeholder="e.g. 5.2"></div>
+      <div class="form-group"><label>Time (mm:ss)</label><input type="text" id="r-time" placeholder="e.g. 48:30"></div>
+      <div class="form-group"><label>Avg Pace (min/mi or km)</label><input type="text" id="r-pace" placeholder="e.g. 9:19"></div>
+      <div class="form-group"><label>Avg Heart Rate</label><input type="number" id="r-hr" placeholder="e.g. 155"></div>
+      <div class="form-group"><label>Calories Burned</label><input type="number" id="r-calories" placeholder="e.g. 420"></div>
+      <div class="form-group"><label>How Did It Feel? (1-10)</label><input type="number" id="r-feel" placeholder="e.g. 7" min="1" max="10"></div>
+      <div class="form-group"><label>Notes</label><input type="text" id="r-notes" placeholder="How was the run?"></div>
+    </div>
+    <button class="btn" onclick="saveRun()">Save Run</button>
+    <button class="btn btn-secondary" onclick="clearRun()">Clear</button>
+  </div>
+  <div class="card">
+    <div class="card-title">All Runs</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Type</th><th>Distance</th><th>Time</th><th>Pace</th><th>HR</th><th>Feel</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="log-tbody"><tr><td colspan="9"><div class="empty"><div class="empty-icon">📝</div><p>No runs logged yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- HR ZONES -->
+<div class="content" id="tab-zones">
+  <div class="card">
+    <div class="card-title">Calculate Your Heart Rate Zones</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div class="form-group"><label>Your Age</label><input type="number" id="z-age" placeholder="e.g. 30" oninput="calcZones()"></div>
+      <div class="form-group"><label>Resting Heart Rate (optional)</label><input type="number" id="z-rhr" placeholder="e.g. 60" oninput="calcZones()"></div>
+    </div>
+    <div id="zones-display"><div class="empty"><div class="empty-icon">❤️</div><p>Enter your age to calculate your heart rate zones</p></div></div>
+  </div>
+</div>
+
+<!-- RACE GOALS -->
+<div class="content" id="tab-goals">
+  <div class="card">
+    <div class="card-title">Add Race Goal</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Race Name</label><input type="text" id="g-name" placeholder="e.g. City 5K Summer Race"></div>
+      <div class="form-group"><label>Race Date</label><input type="date" id="g-date"></div>
+      <div class="form-group"><label>Distance</label><select id="g-dist"><option>5K</option><option>10K</option><option>Half Marathon</option><option>Marathon</option><option>Other</option></select></div>
+      <div class="form-group"><label>Goal Time</label><input type="text" id="g-goal" placeholder="e.g. 25:00"></div>
+      <div class="form-group"><label>Actual Time</label><input type="text" id="g-actual" placeholder="Fill after race"></div>
+      <div class="form-group"><label>Notes</label><input type="text" id="g-notes" placeholder="Race notes..."></div>
+    </div>
+    <button class="btn" onclick="saveGoal()">Save Race</button>
+  </div>
+  <div class="card">
+    <div class="card-title">My Races</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Race</th><th>Date</th><th>Distance</th><th>Goal</th><th>Actual</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="goals-tbody"><tr><td colspan="7"><div class="empty"><div class="empty-icon">🏅</div><p>No races added yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- CHART -->
+<div class="content" id="tab-chart">
+  <div class="card">
+    <div class="card-title">Distance Progress Chart</div>
+    <div id="chart-container"><div class="empty"><div class="empty-icon">📈</div><p>Log at least 2 runs to see your chart</p></div></div>
+  </div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<div class="content" id="tab-instructions">
+  <div class="card">
+    <div class="card-title">How to Use Your Running Log</div>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><h4>Log Every Run</h4><p>After each run, go to Run Log and record your distance, time, pace, and how you felt.</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><h4>Calculate HR Zones</h4><p>Go to HR Zones, enter your age, and get your personalized heart rate training zones.</p></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><h4>Set Race Goals</h4><p>Add upcoming races with your goal time. Fill in your actual time after the race to track PRs.</p></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><h4>Track Progress</h4><p>The Progress Chart shows your distance over time so you can see your volume building.</p></div></div>
+  </div>
+  <div class="card" style="background:var(--orange);color:var(--white);">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--orange);margin-bottom:8px;">DIGITAL FITNESS HUB</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.8);">Questions? Contact us through Etsy. We respond within 24 hours.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const K={runs:'dfh_rc_runs',goals:'dfh_rc_goals'};
+function load(k){try{return JSON.parse(localStorage.getItem(k))||[];}catch{return[];}}
+function save(k,d){localStorage.setItem(k,JSON.stringify(d));}
+function showTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');document.getElementById('tab-'+name).classList.add('active');
+  if(name==='dashboard')renderDashboard();
+  if(name==='log')renderLog();
+  if(name==='goals')renderGoals();
+  if(name==='chart')renderChart();
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function saveRun(){
+  const date=document.getElementById('r-date').value;
+  const dist=document.getElementById('r-distance').value;
+  if(!date||!dist){showToast('Please enter date and distance');return;}
+  const runs=load(K.runs);
+  runs.unshift({date,type:document.getElementById('r-type').value,distance:parseFloat(dist),time:document.getElementById('r-time').value||'',pace:document.getElementById('r-pace').value||'',hr:document.getElementById('r-hr').value||'',calories:document.getElementById('r-calories').value||'',feel:document.getElementById('r-feel').value||'',notes:document.getElementById('r-notes').value||''});
+  save(K.runs,runs);clearRun();renderLog();renderDashboard();showToast('✓ Run saved!');
+}
+function clearRun(){['r-date','r-distance','r-time','r-pace','r-hr','r-calories','r-feel','r-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('r-date').value=new Date().toISOString().split('T')[0];}
+function deleteRun(i){const r=load(K.runs);r.splice(i,1);save(K.runs,r);renderLog();renderDashboard();renderChart();}
+function renderLog(){
+  const runs=load(K.runs);
+  const tbody=document.getElementById('log-tbody');
+  if(!runs.length){tbody.innerHTML='<tr><td colspan="9"><div class="empty"><div class="empty-icon">📝</div><p>No runs yet</p></div></td></tr>';return;}
+  tbody.innerHTML=runs.map((r,i)=>`<tr><td>${r.date}</td><td>${r.type}</td><td><strong>${r.distance}</strong></td><td>${r.time||'—'}</td><td>${r.pace||'—'}</td><td>${r.hr||'—'}</td><td>${r.feel||'—'}/10</td><td>${r.notes||'—'}</td><td><button class="delete-btn" onclick="deleteRun(${i})">✕</button></td></tr>`).join('');
+}
+function calcZones(){
+  const age=parseInt(document.getElementById('z-age').value);
+  const rhr=parseInt(document.getElementById('z-rhr').value)||0;
+  if(!age)return;
+  const maxHR=220-age;
+  const zones=[
+    {name:'Zone 1 — Recovery',pct:'50-60%',min:Math.round(maxHR*.5),max:Math.round(maxHR*.6),color:'#4CAF50',desc:'Very easy, warm up & cool down'},
+    {name:'Zone 2 — Aerobic Base',pct:'60-70%',min:Math.round(maxHR*.6),max:Math.round(maxHR*.7),color:'#8BC34A',desc:'Conversational pace, fat burning'},
+    {name:'Zone 3 — Aerobic',pct:'70-80%',min:Math.round(maxHR*.7),max:Math.round(maxHR*.8),color:'#FFC107',desc:'Moderate effort, tempo running'},
+    {name:'Zone 4 — Threshold',pct:'80-90%',min:Math.round(maxHR*.8),max:Math.round(maxHR*.9),color:'#FF9800',desc:'Hard effort, race pace training'},
+    {name:'Zone 5 — Max Effort',pct:'90-100%',min:Math.round(maxHR*.9),max:maxHR,color:'var(--orange)',desc:'Maximum effort, short intervals only'},
+  ];
+  document.getElementById('zones-display').innerHTML=`
+    <div style="margin-bottom:16px;"><strong>Max Heart Rate: ${maxHR} bpm</strong> (age ${age})</div>
+    ${zones.map(z=>`<div class="hr-zone" style="background:${z.color}15;border-left:4px solid ${z.color};margin-bottom:8px;">
+      <div><div style="font-size:13px;font-weight:700;">${z.name}</div><div style="font-size:12px;color:var(--gray);margin-top:2px;">${z.desc}</div></div>
+      <div style="text-align:right;"><div style="font-size:16px;font-weight:800;">${z.min}–${z.max}</div><div style="font-size:11px;color:var(--gray);">bpm · ${z.pct}</div></div>
+    </div>`).join('')}`;
+}
+function saveGoal(){
+  const name=document.getElementById('g-name').value;
+  if(!name){showToast('Please enter a race name');return;}
+  const goals=load(K.goals);
+  goals.push({id:Date.now(),name,date:document.getElementById('g-date').value||'',dist:document.getElementById('g-dist').value,goal:document.getElementById('g-goal').value||'',actual:document.getElementById('g-actual').value||'',notes:document.getElementById('g-notes').value||''});
+  save(K.goals,goals);
+  ['g-name','g-date','g-goal','g-actual','g-notes'].forEach(id=>document.getElementById(id).value='');
+  renderGoals();showToast('✓ Race added!');
+}
+function deleteGoal(id){const g=load(K.goals).filter(g=>g.id!==id);save(K.goals,g);renderGoals();}
+function renderGoals(){
+  const goals=load(K.goals);
+  const tbody=document.getElementById('goals-tbody');
+  if(!goals.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">🏅</div><p>No races yet</p></div></td></tr>';return;}
+  tbody.innerHTML=goals.map(g=>`<tr><td><strong>${g.name}</strong></td><td>${g.date||'—'}</td><td>${g.dist}</td><td>${g.goal||'—'}</td><td>${g.actual||'Pending'}</td><td>${g.notes||'—'}</td><td><button class="delete-btn" onclick="deleteGoal(${g.id})">✕</button></td></tr>`).join('');
+}
+function renderDashboard(){
+  const runs=load(K.runs);
+  document.getElementById('kpi-runs').textContent=runs.length;
+  const total=runs.reduce((s,r)=>s+(r.distance||0),0);
+  document.getElementById('kpi-distance').textContent=total.toFixed(1);
+  const weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);
+  const weekDist=runs.filter(r=>new Date(r.date)>=weekAgo).reduce((s,r)=>s+(r.distance||0),0);
+  document.getElementById('kpi-week').textContent=weekDist.toFixed(1);
+  const paces=runs.filter(r=>r.pace).map(r=>r.pace);
+  document.getElementById('kpi-pace').textContent=paces.length>0?paces.sort()[0]:'—';
+  const recent=runs.slice(0,7);
+  document.getElementById('dashboard-tbody').innerHTML=recent.length?recent.map(r=>`<tr><td>${r.date}</td><td>${r.type}</td><td><strong>${r.distance}</strong></td><td>${r.time||'—'}</td><td>${r.pace||'—'}</td><td>${r.notes||'—'}</td></tr>`).join(''):'<tr><td colspan="6"><div class="empty"><div class="empty-icon">🏃</div><p>No runs yet</p></div></td></tr>';
+}
+function renderChart(){
+  const runs=load(K.runs).filter(r=>r.distance).reverse().slice(-10);
+  const container=document.getElementById('chart-container');
+  if(runs.length<2){container.innerHTML='<div class="empty"><div class="empty-icon">📈</div><p>Log at least 2 runs to see your chart</p></div>';return;}
+  const dists=runs.map(r=>r.distance);
+  const maxD=Math.max(...dists);
+  container.innerHTML=`<div class="chart-area">${runs.map(r=>{const h=Math.max(8,Math.round((r.distance/maxD)*160));return`<div class="chart-bar-wrap"><div class="chart-value">${r.distance}</div><div class="chart-bar" style="height:${h}px"></div><div class="chart-label">${r.date.slice(5)}</div></div>`}).join('')}</div>`;
+}
+document.getElementById('r-date').value=new Date().toISOString().split('T')[0];
+renderDashboard();
+</script>
+</body>
+</html>

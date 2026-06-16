@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>12-Week Fitness Challenge — Digital Fitness Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#EDE8E2;--orange:#E8622A;--black:#1C1C1C;--white:#FFFFFF;--gray:#5A5550;--light:#F4F1ED;--border:#CCC6BE;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--black);min-height:100vh;}
+  .header{background:var(--cream);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--orange);}
+  .header-brand{font-size:11px;font-weight:600;color:var(--orange);letter-spacing:2px;text-transform:uppercase;}
+  .header-title{font-size:20px;font-weight:800;color:var(--black);}
+  .header-right{font-size:11px;color:var(--gray);}
+  .tabs{background:var(--white);border-bottom:2px solid var(--border);padding:0 32px;display:flex;overflow-x:auto;}
+  .tab{padding:14px 20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;}
+  .tab:hover{color:var(--black);}
+  .tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+  .content{display:none;padding:32px;max-width:1100px;margin:0 auto;}
+  .content.active{display:block;}
+  .card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:24px;}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+  .kpi{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--orange);}
+  .kpi-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .kpi-value{font-size:28px;font-weight:800;color:var(--black);}
+  .kpi-unit{font-size:12px;color:var(--gray);margin-top:2px;}
+  .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);}
+  .form-group input,.form-group select,.form-group textarea{padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--black);background:var(--cream);}
+  .form-group input:focus{outline:none;border-color:var(--orange);}
+  .btn{background:var(--orange);color:var(--white);border:none;padding:12px 28px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:16px;}
+  .btn:hover{opacity:.85;}
+  .btn-secondary{background:transparent;color:var(--orange);border:2px solid var(--orange);margin-left:8px;}
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th{background:var(--orange);color:var(--white);padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:left;}
+  td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);}
+  tr:nth-child(even) td{background:var(--light);}
+  .delete-btn{color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;background:none;border:none;}
+  .progress-bar-wrap{background:var(--border);border-radius:99px;height:12px;overflow:hidden;margin-top:8px;}
+  .progress-bar{background:var(--orange);height:100%;border-radius:99px;transition:width .5s;}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--black);color:var(--white);padding:14px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(20px);transition:all .3s;z-index:999;border-left:4px solid var(--orange);}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .step{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start;}
+  .step-num{background:var(--orange);color:var(--white);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+  .step-text h4{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .step-text p{font-size:13px;color:var(--gray);line-height:1.5;}
+  .empty{text-align:center;padding:40px;color:var(--gray);}
+  .empty-icon{font-size:40px;margin-bottom:12px;}
+  .week-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:8px;}
+  .week-box{background:var(--cream);border-radius:8px;padding:12px 8px;text-align:center;border:2px solid var(--border);cursor:pointer;transition:all .2s;}
+  .week-box.done{background:var(--orange);border-color:var(--orange);color:var(--white);}
+  .week-box.current{border-color:var(--orange);background:var(--white);}
+  .week-box .week-num{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;opacity:.7;}
+  .week-box .week-label{font-size:13px;font-weight:700;margin-top:2px;}
+  @media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}.week-grid{grid-template-columns:repeat(4,1fr);}.header{padding:12px 16px;}.content{padding:16px;}.tabs{padding:0 16px;}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="header-brand">Digital Fitness Hub</div>
+    <div class="header-title">12-Week Fitness Challenge</div>
+  </div>
+  <div class="header-right">84 days. Completely transformed.</div>
+</div>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('dashboard',this)">Dashboard</div>
+  <div class="tab" onclick="showTab('weekly',this)">Week Log</div>
+  <div class="tab" onclick="showTab('goals',this)">Goal Setting</div>
+  <div class="tab" onclick="showTab('nutrition',this)">Nutrition Log</div>
+  <div class="tab" onclick="showTab('instructions',this)">Instructions</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="content active" id="tab-dashboard">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Current Week</div><div class="kpi-value" id="kpi-week">0</div><div class="kpi-unit">of 12 weeks</div></div>
+    <div class="kpi"><div class="kpi-label">Workouts Done</div><div class="kpi-value" id="kpi-workouts">0</div><div class="kpi-unit">total sessions</div></div>
+    <div class="kpi"><div class="kpi-label">Challenge Progress</div><div class="kpi-value" id="kpi-progress">0%</div><div class="kpi-unit">complete</div></div>
+    <div class="kpi"><div class="kpi-label">Weight Change</div><div class="kpi-value" id="kpi-weight">—</div><div class="kpi-unit">from start</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">12-Week Progress</div>
+    <div style="font-size:13px;color:var(--gray);margin-bottom:12px;" id="progress-label">Log your weeks to track your challenge progress</div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+    <div style="margin-top:20px;">
+      <div class="week-grid" id="week-grid"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Weekly Log Summary</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Week</th><th>Workouts</th><th>Weight</th><th>Avg Calories</th><th>Notes</th></tr></thead>
+      <tbody id="summary-tbody"><tr><td colspan="5"><div class="empty"><div class="empty-icon">🗓️</div><p>No weeks logged yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- WEEKLY LOG -->
+<div class="content" id="tab-weekly">
+  <div class="card">
+    <div class="card-title">Log a Week</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Week Number</label><select id="w-week">${Array.from({length:12},(_,i)=>`<option value="${i+1}">Week ${i+1}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Workouts Completed</label><input type="number" id="w-workouts" placeholder="e.g. 4" min="0" max="7"></div>
+      <div class="form-group"><label>End of Week Weight</label><input type="number" step="0.1" id="w-weight" placeholder="e.g. 175.5"></div>
+      <div class="form-group"><label>Avg Daily Calories</label><input type="number" id="w-calories" placeholder="e.g. 1800"></div>
+      <div class="form-group"><label>Energy Level (1-10)</label><input type="number" id="w-energy" placeholder="e.g. 8" min="1" max="10"></div>
+      <div class="form-group"><label>Week Notes</label><input type="text" id="w-notes" placeholder="How was this week?"></div>
+    </div>
+    <button class="btn" onclick="saveWeek()">Save Week</button>
+  </div>
+  <div class="card">
+    <div class="card-title">All Weeks</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Week</th><th>Workouts</th><th>Weight</th><th>Avg Cals</th><th>Energy</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="weekly-tbody"><tr><td colspan="7"><div class="empty"><div class="empty-icon">📅</div><p>No weeks logged yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- GOALS -->
+<div class="content" id="tab-goals">
+  <div class="card">
+    <div class="card-title">Challenge Setup</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Start Date</label><input type="date" id="g-start"></div>
+      <div class="form-group"><label>Starting Weight</label><input type="number" step="0.1" id="g-startweight" placeholder="e.g. 185"></div>
+      <div class="form-group"><label>Goal Weight</label><input type="number" step="0.1" id="g-goalweight" placeholder="e.g. 165"></div>
+      <div class="form-group"><label>Workouts per Week</label><input type="number" id="g-workouts" placeholder="e.g. 4"></div>
+      <div class="form-group"><label>Daily Calorie Target</label><input type="number" id="g-calories" placeholder="e.g. 1800"></div>
+      <div class="form-group"><label>Main Goal</label><input type="text" id="g-goal" placeholder="e.g. Lose 20 lbs, Build muscle..."></div>
+    </div>
+    <button class="btn" onclick="saveGoals()">Save Setup</button>
+  </div>
+  <div class="card" id="goals-card" style="display:none">
+    <div class="card-title">Your Challenge Details</div>
+    <div id="goals-display"></div>
+  </div>
+</div>
+
+<!-- NUTRITION -->
+<div class="content" id="tab-nutrition">
+  <div class="card">
+    <div class="card-title">Log Nutrition</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" id="n-date"></div>
+      <div class="form-group"><label>Calories</label><input type="number" id="n-calories" placeholder="e.g. 1800"></div>
+      <div class="form-group"><label>Protein (g)</label><input type="number" id="n-protein" placeholder="e.g. 150"></div>
+      <div class="form-group"><label>Carbs (g)</label><input type="number" id="n-carbs" placeholder="e.g. 200"></div>
+      <div class="form-group"><label>Fat (g)</label><input type="number" id="n-fat" placeholder="e.g. 60"></div>
+      <div class="form-group"><label>Notes</label><input type="text" id="n-notes" placeholder="What did you eat?"></div>
+    </div>
+    <button class="btn" onclick="saveNutrition()">Save</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Nutrition History</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fat</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="nutrition-tbody"><tr><td colspan="7"><div class="empty"><div class="empty-icon">🥗</div><p>No entries yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<div class="content" id="tab-instructions">
+  <div class="card">
+    <div class="card-title">How to Use Your 12-Week Challenge</div>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><h4>Set Up Your Challenge</h4><p>Go to Goal Setting. Enter your start date, starting weight, goal weight, and how many workouts per week you'll do.</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><h4>Log Each Week</h4><p>At the end of every week, go to Week Log and record your workouts, weight, calories, and how you felt.</p></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><h4>Track Nutrition Daily</h4><p>Use the Nutrition Log to track daily calories, protein, carbs and fat for maximum results.</p></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><h4>Watch Your Progress</h4><p>The Dashboard shows your 12-week grid filling up as you complete weeks. Satisfying to watch it grow!</p></div></div>
+  </div>
+  <div class="card" style="background:var(--orange);color:var(--white);">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--orange);margin-bottom:8px;">DIGITAL FITNESS HUB</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.8);">Questions? Contact us through Etsy. We respond within 24 hours.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const K={weeks:'dfh_12w_weeks',goals:'dfh_12w_goals',nutrition:'dfh_12w_nutrition'};
+function load(k){try{return JSON.parse(localStorage.getItem(k))||[];}catch{return[];}}
+function loadObj(k){try{return JSON.parse(localStorage.getItem(k))||{};}catch{return{};}}
+function save(k,d){localStorage.setItem(k,JSON.stringify(d));}
+function showTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='dashboard')renderDashboard();
+  if(name==='weekly')renderWeekly();
+  if(name==='goals')renderGoals();
+  if(name==='nutrition')renderNutrition();
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function saveWeek(){
+  const week=document.getElementById('w-week').value;
+  const weeks=load(K.weeks).filter(w=>w.week!=week);
+  weeks.push({week:parseInt(week),workouts:document.getElementById('w-workouts').value||0,weight:document.getElementById('w-weight').value||'',calories:document.getElementById('w-calories').value||'',energy:document.getElementById('w-energy').value||'',notes:document.getElementById('w-notes').value||''});
+  weeks.sort((a,b)=>a.week-b.week);
+  save(K.weeks,weeks);renderWeekly();renderDashboard();showToast('✓ Week saved!');
+}
+function deleteWeek(week){const weeks=load(K.weeks).filter(w=>w.week!=week);save(K.weeks,weeks);renderWeekly();renderDashboard();}
+function renderWeekly(){
+  const weeks=load(K.weeks);
+  const tbody=document.getElementById('weekly-tbody');
+  if(!weeks.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">📅</div><p>No weeks logged yet</p></div></td></tr>';return;}
+  tbody.innerHTML=weeks.map(w=>`<tr><td><strong>Week ${w.week}</strong></td><td>${w.workouts}</td><td>${w.weight||'—'}</td><td>${w.calories||'—'}</td><td>${w.energy||'—'}/10</td><td>${w.notes||'—'}</td><td><button class="delete-btn" onclick="deleteWeek(${w.week})">✕</button></td></tr>`).join('');
+}
+function saveGoals(){
+  const g={start:document.getElementById('g-start').value,startweight:document.getElementById('g-startweight').value,goalweight:document.getElementById('g-goalweight').value,workouts:document.getElementById('g-workouts').value,calories:document.getElementById('g-calories').value,goal:document.getElementById('g-goal').value};
+  save(K.goals,g);renderGoals();renderDashboard();showToast('✓ Setup saved!');
+}
+function renderGoals(){
+  const g=loadObj(K.goals);
+  if(g.start){
+    document.getElementById('g-start').value=g.start;
+    document.getElementById('g-startweight').value=g.startweight;
+    document.getElementById('g-goalweight').value=g.goalweight;
+    document.getElementById('g-workouts').value=g.workouts;
+    document.getElementById('g-calories').value=g.calories;
+    document.getElementById('g-goal').value=g.goal;
+    const end=new Date(g.start);end.setDate(end.getDate()+84);
+    document.getElementById('goals-card').style.display='block';
+    document.getElementById('goals-display').innerHTML=`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="padding:12px;background:var(--cream);border-radius:8px;"><div style="font-size:11px;color:var(--gray);font-weight:600;">START DATE</div><div style="font-size:16px;font-weight:800;margin-top:4px;">${g.start}</div></div>
+        <div style="padding:12px;background:var(--cream);border-radius:8px;"><div style="font-size:11px;color:var(--gray);font-weight:600;">END DATE</div><div style="font-size:16px;font-weight:800;margin-top:4px;">${end.toISOString().split('T')[0]}</div></div>
+        <div style="padding:12px;background:var(--cream);border-radius:8px;"><div style="font-size:11px;color:var(--gray);font-weight:600;">STARTING WEIGHT</div><div style="font-size:16px;font-weight:800;margin-top:4px;">${g.startweight||'—'}</div></div>
+        <div style="padding:12px;background:var(--cream);border-radius:8px;"><div style="font-size:11px;color:var(--gray);font-weight:600;">GOAL WEIGHT</div><div style="font-size:16px;font-weight:800;margin-top:4px;">${g.goalweight||'—'}</div></div>
+      </div>`;
+  }
+}
+function saveNutrition(){
+  const date=document.getElementById('n-date').value;
+  if(!date){showToast('Please enter a date');return;}
+  const entries=load(K.nutrition);
+  entries.unshift({date,calories:document.getElementById('n-calories').value||'',protein:document.getElementById('n-protein').value||'',carbs:document.getElementById('n-carbs').value||'',fat:document.getElementById('n-fat').value||'',notes:document.getElementById('n-notes').value||''});
+  save(K.nutrition,entries);
+  ['n-date','n-calories','n-protein','n-carbs','n-fat','n-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('n-date').value=new Date().toISOString().split('T')[0];
+  renderNutrition();showToast('✓ Nutrition saved!');
+}
+function deleteNutrition(i){const e=load(K.nutrition);e.splice(i,1);save(K.nutrition,e);renderNutrition();}
+function renderNutrition(){
+  const entries=load(K.nutrition);
+  const tbody=document.getElementById('nutrition-tbody');
+  if(!entries.length){tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">🥗</div><p>No entries yet</p></div></td></tr>';return;}
+  tbody.innerHTML=entries.map((e,i)=>`<tr><td>${e.date}</td><td>${e.calories||'—'}</td><td>${e.protein||'—'}g</td><td>${e.carbs||'—'}g</td><td>${e.fat||'—'}g</td><td>${e.notes||'—'}</td><td><button class="delete-btn" onclick="deleteNutrition(${i})">✕</button></td></tr>`).join('');
+}
+function renderDashboard(){
+  const weeks=load(K.weeks);
+  const goals=loadObj(K.goals);
+  document.getElementById('kpi-week').textContent=weeks.length>0?Math.max(...weeks.map(w=>w.week)):0;
+  const totalWorkouts=weeks.reduce((s,w)=>s+(parseInt(w.workouts)||0),0);
+  document.getElementById('kpi-workouts').textContent=totalWorkouts;
+  const pct=Math.round((weeks.length/12)*100);
+  document.getElementById('kpi-progress').textContent=pct+'%';
+  document.getElementById('progress-bar').style.width=pct+'%';
+  document.getElementById('progress-label').textContent=`Week ${weeks.length} of 12 complete — ${pct}% done`;
+  if(weeks.length>0&&goals.startweight){
+    const lastWeight=weeks[weeks.length-1].weight;
+    if(lastWeight){const change=(parseFloat(lastWeight)-parseFloat(goals.startweight)).toFixed(1);document.getElementById('kpi-weight').textContent=(change>0?'+':'')+change;}
+  }
+  // week grid
+  const grid=document.getElementById('week-grid');
+  const doneWeeks=new Set(weeks.map(w=>w.week));
+  grid.innerHTML=Array.from({length:12},(_,i)=>{
+    const w=i+1;
+    const cls=doneWeeks.has(w)?'done':weeks.length+1===w?'current':'';
+    return`<div class="week-box ${cls}"><div class="week-num">Week</div><div class="week-label">${w}</div></div>`;
+  }).join('');
+  // summary
+  const tbody=document.getElementById('summary-tbody');
+  if(!weeks.length){tbody.innerHTML='<tr><td colspan="5"><div class="empty"><div class="empty-icon">🗓️</div><p>No weeks logged yet</p></div></td></tr>';return;}
+  tbody.innerHTML=weeks.map(w=>`<tr><td><strong>Week ${w.week}</strong></td><td>${w.workouts}</td><td>${w.weight||'—'}</td><td>${w.calories||'—'}</td><td>${w.notes||'—'}</td></tr>`).join('');
+}
+document.getElementById('n-date').value=new Date().toISOString().split('T')[0];
+renderDashboard();
+</script>
+</body>
+</html>

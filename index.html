@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Fitness Hub — Interactive Trackers</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#EDE8E2;--orange:#E8622A;--black:#1C1C1C;--white:#FFFFFF;--gray:#5A5550;--light:#F4F1ED;--border:#CCC6BE;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--black);min-height:100vh;}
+  .header{background:var(--cream);padding:24px 40px;border-bottom:3px solid var(--orange);display:flex;align-items:center;justify-content:space-between;}
+  .header-brand{font-size:11px;font-weight:700;color:var(--orange);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+  .header-title{font-size:24px;font-weight:800;color:var(--black);}
+  .header-sub{font-size:13px;color:var(--gray);margin-top:2px;}
+  .content{max-width:1100px;margin:0 auto;padding:40px 32px;}
+  .section-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:24px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
+  .card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);text-decoration:none;color:inherit;display:block;transition:transform .2s,box-shadow .2s;border-left:4px solid var(--orange);}
+  .card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.1);}
+  .card-num{font-size:11px;font-weight:700;color:var(--orange);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+  .card-title{font-size:17px;font-weight:800;color:var(--black);margin-bottom:8px;line-height:1.3;}
+  .card-desc{font-size:13px;color:var(--gray);line-height:1.5;}
+  .card-cta{margin-top:16px;font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;}
+  .footer{text-align:center;padding:40px;border-top:1px solid var(--border);margin-top:40px;}
+  .footer-brand{font-size:13px;font-weight:700;color:var(--orange);letter-spacing:1px;text-transform:uppercase;}
+  .footer-text{font-size:12px;color:var(--gray);margin-top:4px;}
+  @media(max-width:768px){.header{padding:16px 20px;}.content{padding:24px 16px;}.grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-brand">Digital Fitness Hub</div>
+    <div class="header-title">Interactive Fitness Trackers</div>
+    <div class="header-sub">10 tools — all data saved locally on your device</div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="section-label">All Trackers</div>
+  <div class="grid">
+
+    <a class="card" href="01_Body_Transformation_Tracker/">
+      <div class="card-num">01</div>
+      <div class="card-title">Body Transformation Tracker</div>
+      <div class="card-desc">Log daily weight, calories, measurements and track your full body transformation over time.</div>
+      <div class="card-cta">Open Tracker →</div>
+    </a>
+
+    <a class="card" href="02_Weight_Loss_Tracker/">
+      <div class="card-num">02</div>
+      <div class="card-title">Weight Loss Tracker</div>
+      <div class="card-desc">Separate food log and weigh-in system with calorie deficit tracking and progress charts.</div>
+      <div class="card-cta">Open Tracker →</div>
+    </a>
+
+    <a class="card" href="03_Workout_Log_Gym_Tracker/">
+      <div class="card-num">03</div>
+      <div class="card-title">Workout Log & Gym Tracker</div>
+      <div class="card-desc">Log every workout, track sets and reps, monitor personal records and weekly volume.</div>
+      <div class="card-cta">Open Tracker →</div>
+    </a>
+
+    <a class="card" href="04_Habit_Tracker_Wellness/">
+      <div class="card-num">04</div>
+      <div class="card-title">Habit Tracker & Wellness</div>
+      <div class="card-desc">Build daily habits with streaks, completion rates and a visual habit calendar.</div>
+      <div class="card-cta">Open Tracker →</div>
+    </a>
+
+    <a class="card" href="05_12_Week_Fitness_Challenge/">
+      <div class="card-num">05</div>
+      <div class="card-title">12-Week Fitness Challenge</div>
+      <div class="card-desc">Structured 12-week program with weekly check-ins, goals and milestone tracking.</div>
+      <div class="card-cta">Open Tracker →</div>
+    </a>
+
+    <a class="card" href="06_Meal_Planner_Grocery_List/">
+      <div class="card-num">06</div>
+      <div class="card-title">Meal Planner & Grocery List</div>
+      <div class="card-desc">Plan weekly meals by day, build your grocery list automatically and track nutrition.</div>
+      <div class="card-cta">Open Tracker →</div>
+    </a>
+
+    <a class="card" href="07_Running_Cardio_Log/">
+      <div class="card-num">07</div>
+      <div class="card-title">Running & Cardio Log</div>
+      <div class="card-desc">Track runs, pace, distance, heart rate zones and cardio progress over time.</div>
+      <div class="card-cta">Open Tracker →</div>
+    </a>
+
+    <a class="card" href="08_Macro_Nutrition_Tracker/">
+      <div class="card-num">08</div>
+      <div class="card-title">Macro Nutrition Tracker</div>
+      <div class="card-desc">Log meals with full macro breakdown, TDEE calculator and daily macro progress bars.</div>
+      <div class="card-cta">Open Tracker →</div>
+    </a>
+
+    <a class="card" href="09_Yoga_Flexibility_Tracker/">
+      <div class="card-num">09</div>
+      <div class="card-title">Yoga & Flexibility Tracker</div>
+      <div class="card-desc">Log yoga sessions, track flexibility milestones and build a pose practice library.</div>
+      <div class="card-cta">Open Tracker →</div>
+    </a>
+
+    <a class="card" href="10_Sleep_Recovery_Log/">
+      <div class="card-num">10</div>
+      <div class="card-title">Sleep & Recovery Log</div>
+      <div class="card-desc">Track sleep hours, quality scores, energy levels and recovery metrics nightly.</div>
+      <div class="card-cta">Open Tracker →</div>
+    </a>
+
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-brand">Digital Fitness Hub</div>
+  <div class="footer-text">All data is saved locally on your device — private, secure, no account needed.</div>
+</div>
+
+</body>
+</html>

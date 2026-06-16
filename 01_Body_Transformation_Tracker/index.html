@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Body Transformation Tracker — Digital Fitness Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #EDE8E2;
+    --orange: #E8622A;
+    --black: #1C1C1C;
+    --white: #FFFFFF;
+    --gray: #5A5550;
+    --light: #F4F1ED;
+    --border: #CCC6BE;
+    --success: #4CAF50;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--cream);
+    color: var(--black);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--cream);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid var(--orange);
+  }
+  .header-brand { font-size: 11px; font-weight: 600; color: var(--orange); letter-spacing: 2px; text-transform: uppercase; }
+  .header-title { font-size: 20px; font-weight: 800; color: var(--black); }
+  .header-right { font-size: 11px; color: var(--gray); }
+
+  /* TABS */
+  .tabs {
+    background: var(--white);
+    border-bottom: 2px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 14px 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--gray);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab:hover { color: var(--black); }
+  .tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+  /* CONTENT */
+  .content { display: none; padding: 32px; max-width: 1100px; margin: 0 auto; }
+  .content.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 24px;
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 16px;
+  }
+
+  /* KPI GRID */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-left: 4px solid var(--orange);
+  }
+  .kpi-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gray); margin-bottom: 8px; }
+  .kpi-value { font-size: 28px; font-weight: 800; color: var(--black); }
+  .kpi-unit { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--gray); }
+  .form-group input, .form-group select, .form-group textarea {
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--black);
+    background: var(--cream);
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--orange);
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  /* BUTTON */
+  .btn {
+    background: var(--orange);
+    color: var(--white);
+    border: none;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    margin-top: 16px;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-secondary {
+    background: transparent;
+    color: var(--orange);
+    border: 2px solid var(--orange);
+    margin-left: 8px;
+  }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: var(--orange);
+    color: var(--white);
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: left;
+  }
+  td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid var(--border); }
+  tr:nth-child(even) td { background: var(--light); }
+  tr:hover td { background: #E4DED7; }
+  .delete-btn { color: var(--orange); cursor: pointer; font-size: 12px; font-weight: 600; background: none; border: none; }
+
+  /* PROGRESS BAR */
+  .progress-bar-wrap { background: var(--border); border-radius: 99px; height: 10px; overflow: hidden; margin-top: 8px; }
+  .progress-bar { background: var(--orange); height: 100%; border-radius: 99px; transition: width 0.5s; }
+
+  /* CHART */
+  .chart-area { height: 200px; position: relative; display: flex; align-items: flex-end; gap: 4px; padding: 16px 0 0; }
+  .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  .chart-bar { width: 100%; background: var(--orange); border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.5s; }
+  .chart-label { font-size: 9px; color: var(--gray); text-align: center; }
+  .chart-value { font-size: 10px; font-weight: 600; color: var(--black); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--black);
+    color: var(--white);
+    padding: 14px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s;
+    z-index: 999;
+    border-left: 4px solid var(--orange);
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* MEASUREMENTS GRID */
+  .measure-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+  /* GOALS */
+  .goal-item { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border); }
+  .goal-item:last-child { border-bottom: none; }
+
+  /* INSTRUCTIONS */
+  .step { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+  .step-num { background: var(--orange); color: var(--white); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex-shrink: 0; }
+  .step-text h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .step-text p { font-size: 13px; color: var(--gray); line-height: 1.5; }
+
+  /* EMPTY STATE */
+  .empty { text-align: center; padding: 40px; color: var(--gray); }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty p { font-size: 14px; }
+
+  @media (max-width: 768px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+    .header { padding: 12px 16px; }
+    .content { padding: 16px; }
+    .tabs { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-brand">Digital Fitness Hub</div>
+    <div class="header-title">Body Transformation Tracker</div>
+  </div>
+  <div class="header-right">Your data is saved locally on your device</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('dashboard')">Dashboard</div>
+  <div class="tab" onclick="showTab('log')">Daily Log</div>
+  <div class="tab" onclick="showTab('measurements')">Measurements</div>
+  <div class="tab" onclick="showTab('goals')">Goals</div>
+  <div class="tab" onclick="showTab('chart')">Progress Chart</div>
+  <div class="tab" onclick="showTab('instructions')">Instructions</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="content active" id="tab-dashboard">
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-label">Current Weight</div>
+      <div class="kpi-value" id="kpi-current">—</div>
+      <div class="kpi-unit">lbs / kg</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Total Lost</div>
+      <div class="kpi-value" id="kpi-lost">—</div>
+      <div class="kpi-unit">from start</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Goal Progress</div>
+      <div class="kpi-value" id="kpi-progress">—</div>
+      <div class="kpi-unit">% complete</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Days Logged</div>
+      <div class="kpi-value" id="kpi-days">0</div>
+      <div class="kpi-unit">total entries</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Goal Progress</div>
+    <div id="progress-bar-label" style="font-size:13px; color:var(--gray); margin-bottom:6px;">Set your goal weight in the Goals tab to track progress</div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Recent Log Entries</div>
+    <div class="table-wrap">
+      <table id="dashboard-table">
+        <thead><tr><th>Date</th><th>Weight</th><th>Calories</th><th>Water (L)</th><th>Notes</th></tr></thead>
+        <tbody id="dashboard-tbody">
+          <tr><td colspan="5"><div class="empty"><div class="empty-icon">📋</div><p>No entries yet — start logging in the Daily Log tab</p></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- DAILY LOG -->
+<div class="content" id="tab-log">
+  <div class="card">
+    <div class="card-title">Add Today's Entry</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="log-date">
+      </div>
+      <div class="form-group">
+        <label>Weight (lbs/kg)</label>
+        <input type="number" step="0.1" id="log-weight" placeholder="e.g. 175.5">
+      </div>
+      <div class="form-group">
+        <label>Calories Eaten</label>
+        <input type="number" id="log-calories" placeholder="e.g. 1800">
+      </div>
+      <div class="form-group">
+        <label>Calories Burned</label>
+        <input type="number" id="log-burned" placeholder="e.g. 400">
+      </div>
+      <div class="form-group">
+        <label>Water (Liters)</label>
+        <input type="number" step="0.1" id="log-water" placeholder="e.g. 2.5">
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <input type="text" id="log-notes" placeholder="How did you feel?">
+      </div>
+    </div>
+    <button class="btn" onclick="saveLog()">Save Entry</button>
+    <button class="btn btn-secondary" onclick="clearLogForm()">Clear</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">All Entries</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>Weight</th><th>Calories</th><th>Burned</th><th>Water</th><th>Notes</th><th></th></tr></thead>
+        <tbody id="log-tbody">
+          <tr><td colspan="7"><div class="empty"><div class="empty-icon">📝</div><p>No entries yet</p></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MEASUREMENTS -->
+<div class="content" id="tab-measurements">
+  <div class="card">
+    <div class="card-title">Add Measurements</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" id="m-date"></div>
+      <div class="form-group"><label>Chest (in/cm)</label><input type="number" step="0.1" id="m-chest" placeholder="e.g. 38"></div>
+      <div class="form-group"><label>Waist (in/cm)</label><input type="number" step="0.1" id="m-waist" placeholder="e.g. 32"></div>
+      <div class="form-group"><label>Hips (in/cm)</label><input type="number" step="0.1" id="m-hips" placeholder="e.g. 40"></div>
+      <div class="form-group"><label>Arms (in/cm)</label><input type="number" step="0.1" id="m-arms" placeholder="e.g. 14"></div>
+      <div class="form-group"><label>Thighs (in/cm)</label><input type="number" step="0.1" id="m-thighs" placeholder="e.g. 22"></div>
+    </div>
+    <button class="btn" onclick="saveMeasurement()">Save Measurements</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Measurements History</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>Chest</th><th>Waist</th><th>Hips</th><th>Arms</th><th>Thighs</th><th></th></tr></thead>
+        <tbody id="measurements-tbody">
+          <tr><td colspan="7"><div class="empty"><div class="empty-icon">📏</div><p>No measurements yet</p></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- GOALS -->
+<div class="content" id="tab-goals">
+  <div class="card">
+    <div class="card-title">Set Your Goals</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Starting Weight</label><input type="number" step="0.1" id="g-start" placeholder="e.g. 185"></div>
+      <div class="form-group"><label>Goal Weight</label><input type="number" step="0.1" id="g-goal" placeholder="e.g. 160"></div>
+      <div class="form-group"><label>Daily Calorie Target</label><input type="number" id="g-calories" placeholder="e.g. 1800"></div>
+      <div class="form-group"><label>Start Date</label><input type="date" id="g-startdate"></div>
+      <div class="form-group"><label>Target Date</label><input type="date" id="g-targetdate"></div>
+    </div>
+    <button class="btn" onclick="saveGoals()">Save Goals</button>
+  </div>
+
+  <div class="card" id="goals-summary" style="display:none">
+    <div class="card-title">Your Goals Summary</div>
+    <div id="goals-display"></div>
+  </div>
+</div>
+
+<!-- PROGRESS CHART -->
+<div class="content" id="tab-chart">
+  <div class="card">
+    <div class="card-title">Weight Progress Chart</div>
+    <div id="chart-container">
+      <div class="empty"><div class="empty-icon">📈</div><p>Add at least 2 weight entries in Daily Log to see your chart</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<div class="content" id="tab-instructions">
+  <div class="card">
+    <div class="card-title">How to Use Your Tracker</div>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-text">
+        <h4>Set Your Goals</h4>
+        <p>Go to the Goals tab and enter your starting weight, goal weight, daily calorie target, and target date. This activates your progress tracking.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-text">
+        <h4>Log Daily</h4>
+        <p>Every day, go to Daily Log and enter your weight, calories eaten, calories burned, water intake and notes. The more consistent you are, the better your dashboard.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-text">
+        <h4>Track Measurements</h4>
+        <p>Every 2-4 weeks, go to Measurements and log your body measurements. This shows your body composition changes beyond just weight.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-text">
+        <h4>Check Your Dashboard</h4>
+        <p>The Dashboard updates automatically with every entry. Check it daily to stay motivated and on track with your transformation.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-text">
+        <h4>Your Data is Safe</h4>
+        <p>All your data is saved locally on your device using your browser's storage. It stays private — never leaves your computer. To back up, use your browser's bookmark or save the file to a folder you back up.</p>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="background:var(--orange); color:var(--white);">
+    <div style="font-size:11px; font-weight:700; letter-spacing:1px; color:var(--orange); margin-bottom:8px;">DIGITAL FITNESS HUB</div>
+    <div style="font-size:13px; color:rgba(255,255,255,0.8);">Questions? Contact us through Etsy. We respond within 24 hours.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const KEYS = { log: 'dfh_bt_log', measurements: 'dfh_bt_measurements', goals: 'dfh_bt_goals' };
+
+function load(key) { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } }
+function loadObj(key) { try { return JSON.parse(localStorage.getItem(key)) || {}; } catch { return {}; } }
+function save(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+
+// ─── TABS ────────────────────────────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'log') renderLog();
+  if (name === 'measurements') renderMeasurements();
+  if (name === 'goals') renderGoals();
+  if (name === 'chart') renderChart();
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── LOG ─────────────────────────────────────────────────────────────────────
+function saveLog() {
+  const date = document.getElementById('log-date').value;
+  const weight = document.getElementById('log-weight').value;
+  if (!date || !weight) { showToast('Please enter at least a date and weight'); return; }
+  const entries = load(KEYS.log);
+  entries.unshift({ date, weight: parseFloat(weight), calories: document.getElementById('log-calories').value || '', burned: document.getElementById('log-burned').value || '', water: document.getElementById('log-water').value || '', notes: document.getElementById('log-notes').value || '' });
+  save(KEYS.log, entries);
+  clearLogForm();
+  renderLog();
+  renderDashboard();
+  showToast('✓ Entry saved!');
+}
+
+function clearLogForm() {
+  ['log-date','log-weight','log-calories','log-burned','log-water','log-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+}
+
+function deleteLog(i) {
+  const entries = load(KEYS.log);
+  entries.splice(i, 1);
+  save(KEYS.log, entries);
+  renderLog();
+  renderDashboard();
+  showToast('Entry deleted');
+}
+
+function renderLog() {
+  const entries = load(KEYS.log);
+  const tbody = document.getElementById('log-tbody');
+  if (!entries.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">📝</div><p>No entries yet</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = entries.map((e, i) => `<tr>
+    <td>${e.date}</td><td><strong>${e.weight}</strong></td><td>${e.calories || '—'}</td>
+    <td>${e.burned || '—'}</td><td>${e.water || '—'}</td><td>${e.notes || '—'}</td>
+    <td><button class="delete-btn" onclick="deleteLog(${i})">✕</button></td>
+  </tr>`).join('');
+}
+
+// ─── MEASUREMENTS ────────────────────────────────────────────────────────────
+function saveMeasurement() {
+  const date = document.getElementById('m-date').value;
+  if (!date) { showToast('Please enter a date'); return; }
+  const entries = load(KEYS.measurements);
+  entries.unshift({
+    date,
+    chest: document.getElementById('m-chest').value || '',
+    waist: document.getElementById('m-waist').value || '',
+    hips: document.getElementById('m-hips').value || '',
+    arms: document.getElementById('m-arms').value || '',
+    thighs: document.getElementById('m-thighs').value || ''
+  });
+  save(KEYS.measurements, entries);
+  ['m-date','m-chest','m-waist','m-hips','m-arms','m-thighs'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('m-date').value = new Date().toISOString().split('T')[0];
+  renderMeasurements();
+  showToast('✓ Measurements saved!');
+}
+
+function deleteMeasurement(i) {
+  const entries = load(KEYS.measurements);
+  entries.splice(i, 1);
+  save(KEYS.measurements, entries);
+  renderMeasurements();
+  showToast('Measurement deleted');
+}
+
+function renderMeasurements() {
+  const entries = load(KEYS.measurements);
+  const tbody = document.getElementById('measurements-tbody');
+  if (!entries.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">📏</div><p>No measurements yet</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = entries.map((e, i) => `<tr>
+    <td>${e.date}</td><td>${e.chest || '—'}</td><td>${e.waist || '—'}</td>
+    <td>${e.hips || '—'}</td><td>${e.arms || '—'}</td><td>${e.thighs || '—'}</td>
+    <td><button class="delete-btn" onclick="deleteMeasurement(${i})">✕</button></td>
+  </tr>`).join('');
+}
+
+// ─── GOALS ───────────────────────────────────────────────────────────────────
+function saveGoals() {
+  const goals = {
+    start: document.getElementById('g-start').value,
+    goal: document.getElementById('g-goal').value,
+    calories: document.getElementById('g-calories').value,
+    startdate: document.getElementById('g-startdate').value,
+    targetdate: document.getElementById('g-targetdate').value
+  };
+  save(KEYS.goals, goals);
+  renderGoals();
+  renderDashboard();
+  showToast('✓ Goals saved!');
+}
+
+function renderGoals() {
+  const g = loadObj(KEYS.goals);
+  if (g.start) {
+    document.getElementById('g-start').value = g.start;
+    document.getElementById('g-goal').value = g.goal;
+    document.getElementById('g-calories').value = g.calories;
+    document.getElementById('g-startdate').value = g.startdate;
+    document.getElementById('g-targetdate').value = g.targetdate;
+    const summary = document.getElementById('goals-summary');
+    const display = document.getElementById('goals-display');
+    const tolose = parseFloat(g.start) - parseFloat(g.goal);
+    summary.style.display = 'block';
+    display.innerHTML = `
+      <div class="goal-item"><span>Starting Weight</span><strong>${g.start} lbs/kg</strong></div>
+      <div class="goal-item"><span>Goal Weight</span><strong>${g.goal} lbs/kg</strong></div>
+      <div class="goal-item"><span>Total to Lose</span><strong>${tolose > 0 ? tolose.toFixed(1) : '—'} lbs/kg</strong></div>
+      <div class="goal-item"><span>Daily Calorie Target</span><strong>${g.calories || '—'} cal</strong></div>
+      <div class="goal-item"><span>Start Date</span><strong>${g.startdate || '—'}</strong></div>
+      <div class="goal-item"><span>Target Date</span><strong>${g.targetdate || '—'}</strong></div>
+    `;
+  }
+}
+
+// ─── DASHBOARD ───────────────────────────────────────────────────────────────
+function renderDashboard() {
+  const entries = load(KEYS.log);
+  const goals = loadObj(KEYS.goals);
+
+  document.getElementById('kpi-days').textContent = entries.length;
+
+  if (entries.length > 0) {
+    const current = entries[0].weight;
+    document.getElementById('kpi-current').textContent = current;
+
+    if (goals.start) {
+      const lost = (parseFloat(goals.start) - current).toFixed(1);
+      document.getElementById('kpi-lost').textContent = (lost > 0 ? '-' : '+') + Math.abs(lost);
+
+      if (goals.goal) {
+        const totalToLose = parseFloat(goals.start) - parseFloat(goals.goal);
+        const actualLost = parseFloat(goals.start) - current;
+        const pct = totalToLose > 0 ? Math.min(100, Math.max(0, Math.round((actualLost / totalToLose) * 100))) : 0;
+        document.getElementById('kpi-progress').textContent = pct + '%';
+        document.getElementById('progress-bar').style.width = pct + '%';
+        document.getElementById('progress-bar-label').textContent = `${pct}% of your goal complete`;
+      }
+    }
+
+    // Recent entries table
+    const recent = entries.slice(0, 7);
+    document.getElementById('dashboard-tbody').innerHTML = recent.map(e => `<tr>
+      <td>${e.date}</td><td><strong>${e.weight}</strong></td><td>${e.calories || '—'}</td>
+      <td>${e.water || '—'}</td><td>${e.notes || '—'}</td>
+    </tr>`).join('');
+  }
+}
+
+// ─── CHART ───────────────────────────────────────────────────────────────────
+function renderChart() {
+  const entries = load(KEYS.log).filter(e => e.weight).reverse().slice(-12);
+  const container = document.getElementById('chart-container');
+  if (entries.length < 2) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">📈</div><p>Add at least 2 weight entries in Daily Log to see your chart</p></div>';
+    return;
+  }
+  const weights = entries.map(e => e.weight);
+  const maxW = Math.max(...weights);
+  const minW = Math.min(...weights);
+  const range = maxW - minW || 1;
+
+  container.innerHTML = `<div class="chart-area">${entries.map(e => {
+    const h = Math.max(8, Math.round(((e.weight - minW) / range) * 150 + 20));
+    const d = e.date.slice(5);
+    return `<div class="chart-bar-wrap">
+      <div class="chart-value">${e.weight}</div>
+      <div class="chart-bar" style="height:${h}px"></div>
+      <div class="chart-label">${d}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+document.getElementById('log-date').value = new Date().toISOString().split('T')[0];
+document.getElementById('m-date').value = new Date().toISOString().split('T')[0];
+renderDashboard();
+renderLog();
+</script>
+</body>
+</html>

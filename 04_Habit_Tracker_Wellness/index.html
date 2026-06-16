@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Habit Tracker & Wellness — Digital Fitness Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#EDE8E2;--orange:#E8622A;--black:#1C1C1C;--white:#FFFFFF;--gray:#5A5550;--light:#F4F1ED;--border:#CCC6BE;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--black);min-height:100vh;}
+  .header{background:var(--cream);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--orange);}
+  .header-brand{font-size:11px;font-weight:600;color:var(--orange);letter-spacing:2px;text-transform:uppercase;}
+  .header-title{font-size:20px;font-weight:800;color:var(--black);}
+  .header-right{font-size:11px;color:var(--gray);}
+  .tabs{background:var(--white);border-bottom:2px solid var(--border);padding:0 32px;display:flex;overflow-x:auto;}
+  .tab{padding:14px 20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;}
+  .tab:hover{color:var(--black);}
+  .tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+  .content{display:none;padding:32px;max-width:1100px;margin:0 auto;}
+  .content.active{display:block;}
+  .card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:24px;}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+  .kpi{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--orange);}
+  .kpi-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .kpi-value{font-size:28px;font-weight:800;color:var(--black);}
+  .kpi-unit{font-size:12px;color:var(--gray);margin-top:2px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+  .form-group label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);}
+  .form-group input{padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--black);background:var(--cream);}
+  .form-group input:focus{outline:none;border-color:var(--orange);}
+  .btn{background:var(--orange);color:var(--white);border:none;padding:12px 28px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:8px;}
+  .btn:hover{opacity:.85;}
+  .btn-sm{padding:8px 16px;font-size:12px;margin-top:0;}
+  .btn-secondary{background:transparent;color:var(--orange);border:2px solid var(--orange);margin-left:8px;}
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th{background:var(--orange);color:var(--white);padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:left;}
+  td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);}
+  tr:nth-child(even) td{background:var(--light);}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--black);color:var(--white);padding:14px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(20px);transition:all .3s;z-index:999;border-left:4px solid var(--orange);}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .step{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start;}
+  .step-num{background:var(--orange);color:var(--white);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+  .step-text h4{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .step-text p{font-size:13px;color:var(--gray);line-height:1.5;}
+  .empty{text-align:center;padding:40px;color:var(--gray);}
+  .empty-icon{font-size:40px;margin-bottom:12px;}
+  /* Habit checkboxes */
+  .habit-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);}
+  .habit-row:last-child{border-bottom:none;}
+  .habit-name{font-size:14px;font-weight:600;}
+  .habit-check{width:28px;height:28px;border-radius:6px;border:2px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:16px;}
+  .habit-check.done{background:var(--orange);border-color:var(--orange);color:var(--white);}
+  .habit-check:hover{border-color:var(--orange);}
+  .habits-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .date-nav{display:flex;align-items:center;gap:12px;}
+  .date-nav button{background:none;border:1.5px solid var(--border);border-radius:6px;padding:6px 12px;cursor:pointer;font-size:13px;}
+  .date-nav button:hover{border-color:var(--orange);color:var(--orange);}
+  .date-display{font-size:14px;font-weight:700;}
+  .streak-badge{background:var(--orange);color:var(--white);padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;}
+  @media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.header{padding:12px 16px;}.content{padding:16px;}.tabs{padding:0 16px;}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="header-brand">Digital Fitness Hub</div>
+    <div class="header-title">Habit Tracker & Wellness</div>
+  </div>
+  <div class="header-right">Your data is saved locally on your device</div>
+</div>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('dashboard',this)">Dashboard</div>
+  <div class="tab" onclick="showTab('daily',this)">Daily Habits</div>
+  <div class="tab" onclick="showTab('habits',this)">My Habits</div>
+  <div class="tab" onclick="showTab('history',this)">History</div>
+  <div class="tab" onclick="showTab('instructions',this)">Instructions</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="content active" id="tab-dashboard">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Today's Score</div><div class="kpi-value" id="kpi-today">0%</div><div class="kpi-unit">habits done today</div></div>
+    <div class="kpi"><div class="kpi-label">Current Streak</div><div class="kpi-value" id="kpi-streak">0</div><div class="kpi-unit">days in a row</div></div>
+    <div class="kpi"><div class="kpi-label">This Month</div><div class="kpi-value" id="kpi-month">0%</div><div class="kpi-unit">completion rate</div></div>
+    <div class="kpi"><div class="kpi-label">Total Days</div><div class="kpi-value" id="kpi-days">0</div><div class="kpi-unit">days logged</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Today's Habits</div>
+    <div id="dashboard-habits"><div class="empty"><div class="empty-icon">✨</div><p>Add your habits in "My Habits" tab to get started</p></div></div>
+  </div>
+</div>
+
+<!-- DAILY HABITS -->
+<div class="content" id="tab-daily">
+  <div class="card">
+    <div class="habits-header">
+      <div class="date-nav">
+        <button onclick="changeDate(-1)">◀</button>
+        <div class="date-display" id="daily-date-display"></div>
+        <button onclick="changeDate(1)">▶</button>
+      </div>
+      <button class="btn btn-sm" onclick="saveDaily()">Save Day</button>
+    </div>
+    <div id="daily-habits-list"><div class="empty"><div class="empty-icon">📋</div><p>Add habits in "My Habits" tab first</p></div></div>
+  </div>
+</div>
+
+<!-- MY HABITS -->
+<div class="content" id="tab-habits">
+  <div class="card">
+    <div class="card-title">Add a New Habit</div>
+    <div class="form-group"><label>Habit Name</label><input type="text" id="h-name" placeholder="e.g. Exercise 30 min, Drink 2L water, Read 20 pages..."></div>
+    <button class="btn" onclick="addHabit()">Add Habit</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Your Habits</div>
+    <div id="habits-list"><div class="empty"><div class="empty-icon">🎯</div><p>No habits yet — add your first one above</p></div></div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div class="content" id="tab-history">
+  <div class="card">
+    <div class="card-title">Completion History</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Completed</th><th>Total</th><th>Score</th></tr></thead>
+      <tbody id="history-tbody"><tr><td colspan="4"><div class="empty"><div class="empty-icon">📊</div><p>No history yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<div class="content" id="tab-instructions">
+  <div class="card">
+    <div class="card-title">How to Use Your Habit Tracker</div>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><h4>Add Your Habits</h4><p>Go to "My Habits" and add the habits you want to track. Start with 3-5 habits maximum for best results.</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><h4>Check Off Daily</h4><p>Every day, go to "Daily Habits", check off what you completed, and tap Save Day.</p></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><h4>Track Your Streak</h4><p>The Dashboard shows your current streak and monthly completion rate automatically.</p></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><h4>Review History</h4><p>The History tab shows your daily scores over time so you can spot patterns and improve.</p></div></div>
+    <div class="step"><div class="step-num">5</div><div class="step-text"><h4>Your Data is Safe</h4><p>All data is saved locally on your device. Private, secure, no account needed.</p></div></div>
+  </div>
+  <div class="card" style="background:var(--orange);color:var(--white);">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--orange);margin-bottom:8px;">DIGITAL FITNESS HUB</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.8);">Questions? Contact us through Etsy. We respond within 24 hours.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const K={habits:'dfh_ht_habits',daily:'dfh_ht_daily'};
+let currentDate=new Date().toISOString().split('T')[0];
+function load(k){try{return JSON.parse(localStorage.getItem(k))||[];}catch{return[];}}
+function loadObj(k){try{return JSON.parse(localStorage.getItem(k))||{};}catch{return{};}}
+function save(k,d){localStorage.setItem(k,JSON.stringify(d));}
+function showTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='dashboard')renderDashboard();
+  if(name==='daily')renderDaily();
+  if(name==='habits')renderHabits();
+  if(name==='history')renderHistory();
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function addHabit(){
+  const name=document.getElementById('h-name').value.trim();
+  if(!name){showToast('Please enter a habit name');return;}
+  const habits=load(K.habits);
+  habits.push({id:Date.now(),name});
+  save(K.habits,habits);
+  document.getElementById('h-name').value='';
+  renderHabits();showToast('✓ Habit added!');
+}
+function deleteHabit(id){
+  const habits=load(K.habits).filter(h=>h.id!==id);
+  save(K.habits,habits);renderHabits();renderDaily();renderDashboard();showToast('Habit removed');
+}
+function renderHabits(){
+  const habits=load(K.habits);
+  const list=document.getElementById('habits-list');
+  if(!habits.length){list.innerHTML='<div class="empty"><div class="empty-icon">🎯</div><p>No habits yet</p></div>';return;}
+  list.innerHTML=habits.map(h=>`<div class="habit-row"><div class="habit-name">${h.name}</div><button class="btn btn-sm" style="background:transparent;color:var(--orange);border:1.5px solid var(--orange);margin-top:0;" onclick="deleteHabit(${h.id})">Remove</button></div>`).join('');
+}
+function changeDate(d){
+  const date=new Date(currentDate);date.setDate(date.getDate()+d);
+  if(date>new Date())return;
+  currentDate=date.toISOString().split('T')[0];
+  renderDaily();
+}
+function renderDaily(){
+  const habits=load(K.habits);
+  const daily=loadObj(K.daily);
+  const todayData=daily[currentDate]||{};
+  const display=document.getElementById('daily-date-display');
+  if(display)display.textContent=currentDate;
+  const list=document.getElementById('daily-habits-list');
+  if(!list)return;
+  if(!habits.length){list.innerHTML='<div class="empty"><div class="empty-icon">📋</div><p>Add habits in "My Habits" tab first</p></div>';return;}
+  list.innerHTML=habits.map(h=>{
+    const done=todayData[h.id]||false;
+    return`<div class="habit-row"><div class="habit-name">${h.name}</div><div class="habit-check ${done?'done':''}" onclick="toggleHabit(${h.id})">${done?'✓':''}</div></div>`;
+  }).join('');
+}
+function toggleHabit(id){
+  const daily=loadObj(K.daily);
+  if(!daily[currentDate])daily[currentDate]={};
+  daily[currentDate][id]=!daily[currentDate][id];
+  save(K.daily,daily);renderDaily();renderDashboard();
+}
+function saveDaily(){
+  showToast('✓ Day saved!');renderHistory();renderDashboard();
+}
+function renderDashboard(){
+  const habits=load(K.habits);
+  const daily=loadObj(K.daily);
+  const today=new Date().toISOString().split('T')[0];
+  const todayData=daily[today]||{};
+  const doneTodayCt=habits.filter(h=>todayData[h.id]).length;
+  const pct=habits.length?Math.round((doneTodayCt/habits.length)*100):0;
+  document.getElementById('kpi-today').textContent=pct+'%';
+  document.getElementById('kpi-days').textContent=Object.keys(daily).length;
+  // streak
+  let streak=0;const d=new Date();
+  while(true){
+    const key=d.toISOString().split('T')[0];
+    const data=daily[key]||{};
+    const done=habits.filter(h=>data[h.id]).length;
+    if(done===habits.length&&habits.length>0){streak++;d.setDate(d.getDate()-1);}else break;
+  }
+  document.getElementById('kpi-streak').textContent=streak;
+  // month
+  const now=new Date();
+  let monthTotal=0,monthDays=0;
+  for(let i=1;i<=now.getDate();i++){
+    const key=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+    if(daily[key]&&habits.length){const done=habits.filter(h=>daily[key][h.id]).length;monthTotal+=done/habits.length;monthDays++;}
+  }
+  document.getElementById('kpi-month').textContent=monthDays?Math.round((monthTotal/monthDays)*100)+'%':'0%';
+  // today habits on dashboard
+  const dash=document.getElementById('dashboard-habits');
+  if(!habits.length){dash.innerHTML='<div class="empty"><div class="empty-icon">✨</div><p>Add your habits in "My Habits" tab</p></div>';return;}
+  dash.innerHTML=habits.map(h=>{
+    const done=todayData[h.id]||false;
+    return`<div class="habit-row"><div class="habit-name">${h.name}</div><div class="habit-check ${done?'done':''}">${done?'✓':'○'}</div></div>`;
+  }).join('');
+}
+function renderHistory(){
+  const habits=load(K.habits);
+  const daily=loadObj(K.daily);
+  const tbody=document.getElementById('history-tbody');
+  const dates=Object.keys(daily).sort().reverse();
+  if(!dates.length){tbody.innerHTML='<tr><td colspan="4"><div class="empty"><div class="empty-icon">📊</div><p>No history yet</p></div></td></tr>';return;}
+  tbody.innerHTML=dates.map(date=>{
+    const data=daily[date]||{};
+    const done=habits.filter(h=>data[h.id]).length;
+    const pct=habits.length?Math.round((done/habits.length)*100):0;
+    const color=pct>=80?'color:green':pct>=50?'color:var(--orange)':'';
+    return`<tr><td>${date}</td><td>${done}</td><td>${habits.length}</td><td style="${color}"><strong>${pct}%</strong></td></tr>`;
+  }).join('');
+}
+renderDashboard();
+renderDaily();
+document.getElementById('daily-date-display').textContent=currentDate;
+</script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Macro Nutrition Tracker — Digital Fitness Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#EDE8E2;--orange:#E8622A;--black:#1C1C1C;--white:#FFFFFF;--gray:#5A5550;--light:#F4F1ED;--border:#CCC6BE;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--black);min-height:100vh;}
+  .header{background:var(--cream);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--orange);}
+  .header-brand{font-size:11px;font-weight:600;color:var(--orange);letter-spacing:2px;text-transform:uppercase;}
+  .header-title{font-size:20px;font-weight:800;color:var(--black);}
+  .header-right{font-size:11px;color:var(--gray);}
+  .tabs{background:var(--white);border-bottom:2px solid var(--border);padding:0 32px;display:flex;overflow-x:auto;}
+  .tab{padding:14px 20px;font-size:12px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;}
+  .tab:hover{color:var(--black);}
+  .tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+  .content{display:none;padding:32px;max-width:1100px;margin:0 auto;}
+  .content.active{display:block;}
+  .card{background:var(--white);border-radius:12px;padding:24px;box-shadow:0 2px 8px rgba(0,0,0,.06);margin-bottom:24px;}
+  .card-title{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;}
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+  .kpi{background:var(--white);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid var(--orange);}
+  .kpi-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gray);margin-bottom:8px;}
+  .kpi-value{font-size:28px;font-weight:800;color:var(--black);}
+  .kpi-unit{font-size:12px;color:var(--gray);margin-top:2px;}
+  .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--gray);}
+  .form-group input,.form-group select{padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--black);background:var(--cream);}
+  .form-group input:focus,.form-group select:focus{outline:none;border-color:var(--orange);}
+  .btn{background:var(--orange);color:var(--white);border:none;padding:12px 28px;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:16px;}
+  .btn:hover{opacity:.85;}
+  .btn-secondary{background:transparent;color:var(--orange);border:2px solid var(--orange);margin-left:8px;}
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;}
+  th{background:var(--orange);color:var(--white);padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;text-align:left;}
+  td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border);}
+  tr:nth-child(even) td{background:var(--light);}
+  .delete-btn{color:var(--orange);cursor:pointer;font-size:12px;font-weight:600;background:none;border:none;}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--black);color:var(--white);padding:14px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(20px);transition:all .3s;z-index:999;border-left:4px solid var(--orange);}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .step{display:flex;gap:16px;margin-bottom:20px;align-items:flex-start;}
+  .step-num{background:var(--orange);color:var(--white);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+  .step-text h4{font-size:14px;font-weight:700;margin-bottom:4px;}
+  .step-text p{font-size:13px;color:var(--gray);line-height:1.5;}
+  .empty{text-align:center;padding:40px;color:var(--gray);}
+  .empty-icon{font-size:40px;margin-bottom:12px;}
+  .macro-bar-wrap{margin-bottom:12px;}
+  .macro-bar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;}
+  .macro-bar-track{background:var(--border);border-radius:99px;height:8px;overflow:hidden;}
+  .macro-bar-fill{height:100%;border-radius:99px;transition:width .5s;}
+  .tdee-result{background:var(--cream);border-radius:12px;padding:20px;margin-top:16px;}
+  .tdee-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);}
+  .tdee-row:last-child{border-bottom:none;}
+  .tdee-label{font-size:13px;color:var(--gray);}
+  .tdee-value{font-size:16px;font-weight:800;}
+  @media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}.header{padding:12px 16px;}.content{padding:16px;}.tabs{padding:0 16px;}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="header-brand">Digital Fitness Hub</div>
+    <div class="header-title">Macro Nutrition Tracker</div>
+  </div>
+  <div class="header-right">Your data is saved locally on your device</div>
+</div>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('dashboard',this)">Dashboard</div>
+  <div class="tab" onclick="showTab('log',this)">Daily Log</div>
+  <div class="tab" onclick="showTab('tdee',this)">TDEE Calculator</div>
+  <div class="tab" onclick="showTab('goals',this)">Macro Goals</div>
+  <div class="tab" onclick="showTab('instructions',this)">Instructions</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="content active" id="tab-dashboard">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Calories Today</div><div class="kpi-value" id="kpi-cals">0</div><div class="kpi-unit">eaten today</div></div>
+    <div class="kpi"><div class="kpi-label">Protein Today</div><div class="kpi-value" id="kpi-protein">0g</div><div class="kpi-unit">today</div></div>
+    <div class="kpi"><div class="kpi-label">Remaining</div><div class="kpi-value" id="kpi-remaining">—</div><div class="kpi-unit">calories left</div></div>
+    <div class="kpi"><div class="kpi-label">Days Logged</div><div class="kpi-value" id="kpi-days">0</div><div class="kpi-unit">total days</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Today's Macro Progress</div>
+    <div id="macro-bars"><div style="font-size:13px;color:var(--gray);">Set your macro goals to see progress bars</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Today's Food Log</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Meal</th><th>Food</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fat</th></tr></thead>
+      <tbody id="today-tbody"><tr><td colspan="6"><div class="empty"><div class="empty-icon">🥗</div><p>Nothing logged today yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- DAILY LOG -->
+<div class="content" id="tab-log">
+  <div class="card">
+    <div class="card-title">Log a Meal</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" id="l-date"></div>
+      <div class="form-group"><label>Meal</label><select id="l-meal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack 1</option><option>Snack 2</option></select></div>
+      <div class="form-group"><label>Food Item</label><input type="text" id="l-food" placeholder="e.g. Chicken breast 150g"></div>
+      <div class="form-group"><label>Calories</label><input type="number" id="l-calories" placeholder="e.g. 250"></div>
+      <div class="form-group"><label>Protein (g)</label><input type="number" step="0.1" id="l-protein" placeholder="e.g. 46"></div>
+      <div class="form-group"><label>Carbs (g)</label><input type="number" step="0.1" id="l-carbs" placeholder="e.g. 0"></div>
+      <div class="form-group"><label>Fat (g)</label><input type="number" step="0.1" id="l-fat" placeholder="e.g. 5"></div>
+      <div class="form-group"><label>Notes</label><input type="text" id="l-notes" placeholder="Optional"></div>
+    </div>
+    <button class="btn" onclick="saveLog()">Save Meal</button>
+    <button class="btn btn-secondary" onclick="clearLog()">Clear</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Food Log History</div>
+    <div class="table-wrap">
+      <table><thead><tr><th>Date</th><th>Meal</th><th>Food</th><th>Cal</th><th>Protein</th><th>Carbs</th><th>Fat</th><th></th></tr></thead>
+      <tbody id="log-tbody"><tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div><p>No entries yet</p></div></td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- TDEE -->
+<div class="content" id="tab-tdee">
+  <div class="card">
+    <div class="card-title">TDEE Calculator (Total Daily Energy Expenditure)</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Age</label><input type="number" id="t-age" placeholder="e.g. 30" oninput="calcTDEE()"></div>
+      <div class="form-group"><label>Gender</label><select id="t-gender" onchange="calcTDEE()"><option>Male</option><option>Female</option></select></div>
+      <div class="form-group"><label>Weight (kg)</label><input type="number" step="0.1" id="t-weight" placeholder="e.g. 75" oninput="calcTDEE()"></div>
+      <div class="form-group"><label>Height (cm)</label><input type="number" id="t-height" placeholder="e.g. 175" oninput="calcTDEE()"></div>
+      <div class="form-group" style="grid-column:1/-1"><label>Activity Level</label><select id="t-activity" onchange="calcTDEE()">
+        <option value="1.2">Sedentary (desk job, no exercise)</option>
+        <option value="1.375">Lightly Active (1-3 days/week)</option>
+        <option value="1.55" selected>Moderately Active (3-5 days/week)</option>
+        <option value="1.725">Very Active (6-7 days/week)</option>
+        <option value="1.9">Extra Active (2x per day training)</option>
+      </select></div>
+    </div>
+    <div id="tdee-result" style="display:none" class="tdee-result"></div>
+  </div>
+</div>
+
+<!-- MACRO GOALS -->
+<div class="content" id="tab-goals">
+  <div class="card">
+    <div class="card-title">Set Your Daily Macro Targets</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Daily Calorie Target</label><input type="number" id="g-cals" placeholder="e.g. 2000"></div>
+      <div class="form-group"><label>Protein Target (g)</label><input type="number" id="g-protein" placeholder="e.g. 160"></div>
+      <div class="form-group"><label>Carbs Target (g)</label><input type="number" id="g-carbs" placeholder="e.g. 200"></div>
+      <div class="form-group"><label>Fat Target (g)</label><input type="number" id="g-fat" placeholder="e.g. 65"></div>
+    </div>
+    <button class="btn" onclick="saveGoals()">Save Targets</button>
+  </div>
+  <div class="card" id="goals-summary" style="display:none">
+    <div class="card-title">Your Daily Targets</div>
+    <div id="goals-display"></div>
+  </div>
+</div>
+
+<!-- INSTRUCTIONS -->
+<div class="content" id="tab-instructions">
+  <div class="card">
+    <div class="card-title">How to Use Your Macro Tracker</div>
+    <div class="step"><div class="step-num">1</div><div class="step-text"><h4>Calculate Your TDEE</h4><p>Go to TDEE Calculator. Enter your age, gender, weight, height and activity level to get your calorie targets.</p></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text"><h4>Set Macro Goals</h4><p>Go to Macro Goals and enter your daily calorie, protein, carb and fat targets.</p></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text"><h4>Log Every Meal</h4><p>After each meal, go to Daily Log and enter the food with its macros. Be as accurate as possible.</p></div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text"><h4>Check Your Dashboard</h4><p>The Dashboard shows today's progress bars for calories, protein, carbs and fat in real-time.</p></div></div>
+  </div>
+  <div class="card" style="background:var(--orange);color:var(--white);">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--orange);margin-bottom:8px;">DIGITAL FITNESS HUB</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.8);">Questions? Contact us through Etsy. We respond within 24 hours.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+const K={log:'dfh_mn_log',goals:'dfh_mn_goals'};
+function load(k){try{return JSON.parse(localStorage.getItem(k))||[];}catch{return[];}}
+function loadObj(k){try{return JSON.parse(localStorage.getItem(k))||{};}catch{return{};}}
+function save(k,d){localStorage.setItem(k,JSON.stringify(d));}
+function showTab(name,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');document.getElementById('tab-'+name).classList.add('active');
+  if(name==='dashboard')renderDashboard();
+  if(name==='log')renderLog();
+  if(name==='goals')renderGoals();
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function saveLog(){
+  const date=document.getElementById('l-date').value;
+  const food=document.getElementById('l-food').value;
+  if(!date||!food){showToast('Please enter date and food');return;}
+  const entries=load(K.log);
+  entries.unshift({date,meal:document.getElementById('l-meal').value,food,calories:parseFloat(document.getElementById('l-calories').value)||0,protein:parseFloat(document.getElementById('l-protein').value)||0,carbs:parseFloat(document.getElementById('l-carbs').value)||0,fat:parseFloat(document.getElementById('l-fat').value)||0,notes:document.getElementById('l-notes').value||''});
+  save(K.log,entries);clearLog();renderLog();renderDashboard();showToast('✓ Meal saved!');
+}
+function clearLog(){['l-food','l-calories','l-protein','l-carbs','l-fat','l-notes'].forEach(id=>document.getElementById(id).value='');document.getElementById('l-date').value=new Date().toISOString().split('T')[0];}
+function deleteEntry(i){const e=load(K.log);e.splice(i,1);save(K.log,e);renderLog();renderDashboard();}
+function renderLog(){
+  const entries=load(K.log);
+  const tbody=document.getElementById('log-tbody');
+  if(!entries.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty"><div class="empty-icon">📋</div><p>No entries yet</p></div></td></tr>';return;}
+  tbody.innerHTML=entries.map((e,i)=>`<tr><td>${e.date}</td><td>${e.meal}</td><td><strong>${e.food}</strong></td><td>${e.calories}</td><td>${e.protein}g</td><td>${e.carbs}g</td><td>${e.fat}g</td><td><button class="delete-btn" onclick="deleteEntry(${i})">✕</button></td></tr>`).join('');
+}
+function calcTDEE(){
+  const age=parseFloat(document.getElementById('t-age').value);
+  const weight=parseFloat(document.getElementById('t-weight').value);
+  const height=parseFloat(document.getElementById('t-height').value);
+  const gender=document.getElementById('t-gender').value;
+  const activity=parseFloat(document.getElementById('t-activity').value);
+  if(!age||!weight||!height)return;
+  let bmr;
+  if(gender==='Male')bmr=10*weight+6.25*height-5*age+5;
+  else bmr=10*weight+6.25*height-5*age-161;
+  const tdee=Math.round(bmr*activity);
+  const cut=tdee-500;
+  const bulk=tdee+300;
+  const result=document.getElementById('tdee-result');
+  result.style.display='block';
+  result.innerHTML=`
+    <div class="tdee-row"><div class="tdee-label">BMR (Base Metabolic Rate)</div><div class="tdee-value">${Math.round(bmr)} cal</div></div>
+    <div class="tdee-row"><div class="tdee-label">TDEE (Maintenance)</div><div class="tdee-value" style="color:var(--orange)">${tdee} cal</div></div>
+    <div class="tdee-row"><div class="tdee-label">Fat Loss Target (−500 cal)</div><div class="tdee-value">${cut} cal</div></div>
+    <div class="tdee-row"><div class="tdee-label">Muscle Gain Target (+300 cal)</div><div class="tdee-value">${bulk} cal</div></div>
+    <div style="margin-top:12px;font-size:12px;color:var(--gray);">Recommended protein: ${Math.round(weight*2.2)}g/day (1g per lb of bodyweight)</div>`;
+}
+function saveGoals(){
+  const g={cals:document.getElementById('g-cals').value,protein:document.getElementById('g-protein').value,carbs:document.getElementById('g-carbs').value,fat:document.getElementById('g-fat').value};
+  save(K.goals,g);renderGoals();renderDashboard();showToast('✓ Targets saved!');
+}
+function renderGoals(){
+  const g=loadObj(K.goals);
+  if(g.cals){
+    document.getElementById('g-cals').value=g.cals;
+    document.getElementById('g-protein').value=g.protein;
+    document.getElementById('g-carbs').value=g.carbs;
+    document.getElementById('g-fat').value=g.fat;
+    document.getElementById('goals-summary').style.display='block';
+    document.getElementById('goals-display').innerHTML=`
+      <div class="tdee-row"><div class="tdee-label">Daily Calories</div><div class="tdee-value">${g.cals} cal</div></div>
+      <div class="tdee-row"><div class="tdee-label">Protein</div><div class="tdee-value">${g.protein}g</div></div>
+      <div class="tdee-row"><div class="tdee-label">Carbohydrates</div><div class="tdee-value">${g.carbs}g</div></div>
+      <div class="tdee-row"><div class="tdee-label">Fat</div><div class="tdee-value">${g.fat}g</div></div>`;
+  }
+}
+function renderDashboard(){
+  const entries=load(K.log);
+  const goals=loadObj(K.goals);
+  const today=new Date().toISOString().split('T')[0];
+  const todayEntries=entries.filter(e=>e.date===today);
+  const totals={cals:0,protein:0,carbs:0,fat:0};
+  todayEntries.forEach(e=>{totals.cals+=e.calories;totals.protein+=e.protein;totals.carbs+=e.carbs;totals.fat+=e.fat;});
+  document.getElementById('kpi-cals').textContent=Math.round(totals.cals);
+  document.getElementById('kpi-protein').textContent=Math.round(totals.protein)+'g';
+  document.getElementById('kpi-days').textContent=new Set(entries.map(e=>e.date)).size;
+  if(goals.cals){
+    const rem=parseInt(goals.cals)-Math.round(totals.cals);
+    document.getElementById('kpi-remaining').textContent=rem>0?rem:'0';
+    document.getElementById('macro-bars').innerHTML=[
+      {label:'Calories',cur:Math.round(totals.cals),goal:goals.cals,color:'var(--orange)'},
+      {label:'Protein',cur:Math.round(totals.protein),goal:goals.protein,unit:'g',color:'#E8622A'},
+      {label:'Carbs',cur:Math.round(totals.carbs),goal:goals.carbs,unit:'g',color:'#F4A261'},
+      {label:'Fat',cur:Math.round(totals.fat),goal:goals.fat,unit:'g',color:'#E76F51'},
+    ].map(m=>{
+      const pct=Math.min(100,Math.round((m.cur/m.goal)*100));
+      return`<div class="macro-bar-wrap">
+        <div class="macro-bar-label"><span><strong>${m.label}</strong></span><span>${m.cur}${m.unit||''} / ${m.goal}${m.unit||''} (${pct}%)</span></div>
+        <div class="macro-bar-track"><div class="macro-bar-fill" style="width:${pct}%;background:${m.color}"></div></div>
+      </div>`;
+    }).join('');
+  }
+  const today_tbody=document.getElementById('today-tbody');
+  today_tbody.innerHTML=todayEntries.length?todayEntries.map(e=>`<tr><td>${e.meal}</td><td><strong>${e.food}</strong></td><td>${e.calories}</td><td>${e.protein}g</td><td>${e.carbs}g</td><td>${e.fat}g</td></tr>`).join(''):'<tr><td colspan="6"><div class="empty"><div class="empty-icon">🥗</div><p>Nothing logged today yet</p></div></td></tr>';
+}
+document.getElementById('l-date').value=new Date().toISOString().split('T')[0];
+renderDashboard();
+</script>
+</body>
+</html>
