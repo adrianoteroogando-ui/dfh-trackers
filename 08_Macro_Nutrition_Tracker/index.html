@@ -58,7 +58,53 @@
   .tdee-label{font-size:13px;color:var(--gray);}
   .tdee-value{font-size:16px;font-weight:800;}
   @media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.form-grid{grid-template-columns:1fr;}.header{padding:12px 16px;}.content{padding:16px;}.tabs{padding:0 16px;}}
+
+  /* BACKUP BAR */
+  .backup-bar {
+    background: var(--light);
+    padding: 7px 32px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .backup-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gray);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-right: 2px;
+  }
+  .backup-btn {
+    background: none;
+    border: 1.5px solid var(--border);
+    color: var(--gray);
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+  .backup-btn:hover { border-color: var(--orange); color: var(--orange); background: rgba(232,98,42,0.06); }
+  .backup-hint {
+    font-size: 10px;
+    color: var(--border);
+    margin-left: auto;
+    font-style: italic;
+  }
 </style>
+<link rel="manifest" href="/08_Macro_Nutrition_Tracker/manifest.json">
+<meta name="theme-color" content="#E8622A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Macro Tracker">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 </head>
 <body>
 <div class="header">
@@ -74,6 +120,13 @@
   <div class="tab" onclick="showTab('tdee',this)">TDEE Calculator</div>
   <div class="tab" onclick="showTab('goals',this)">Macro Goals</div>
   <div class="tab" onclick="showTab('instructions',this)">Instructions</div>
+</div>
+
+<div class="backup-bar">
+  <span class="backup-label">Your Data:</span>
+  <button class="backup-btn" onclick="exportData()">&#11015; Export Backup</button>
+  <label class="backup-btn" style="cursor:pointer">&#11014; Import Backup<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+  <span class="backup-hint">Export regularly to keep a copy of your data</span>
 </div>
 
 <!-- DASHBOARD -->
@@ -280,6 +333,52 @@ function renderDashboard(){
 }
 document.getElementById('l-date').value=new Date().toISOString().split('T')[0];
 renderDashboard();
+
+// ─── BACKUP ──────────────────────────────────────────────────────────────────
+function exportData() {
+  const KEY_OBJ = (typeof KEYS !== 'undefined') ? KEYS : K;
+  const backup = { _tracker: document.title, _version: 2, _exported: new Date().toISOString() };
+  Object.values(KEY_OBJ).forEach(k => {
+    try { const v = localStorage.getItem(k); if (v !== null) backup[k] = JSON.parse(v); } catch {}
+  });
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'dfh-macro-tracker-backup-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  showToast('Backup saved to your Downloads folder!');
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (!file.name.endsWith('.json')) { showToast('Please select a .json backup file'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const KEY_OBJ = (typeof KEYS !== 'undefined') ? KEYS : K;
+      const b = JSON.parse(ev.target.result);
+      let restored = 0;
+      Object.values(KEY_OBJ).forEach(k => {
+        if (b[k] !== undefined) { localStorage.setItem(k, JSON.stringify(b[k])); restored++; }
+      });
+      if (restored === 0) { showToast('No matching data found in this file'); return; }
+      showToast('Data restored! Reloading...');
+      setTimeout(() => location.reload(), 1200);
+    } catch { showToast('Error reading backup file — is it a valid DFH export?'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>

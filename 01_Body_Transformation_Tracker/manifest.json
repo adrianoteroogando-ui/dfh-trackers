@@ -1,0 +1,25 @@
+{
+  "name": "Body Transformation Tracker \u2014 Digital Fitness Hub",
+  "short_name": "Body Tracker",
+  "description": "Track your body transformation tracker with automatic calculations. No account, no subscription \u2014 data stays private on your device.",
+  "start_url": "/01_Body_Transformation_Tracker/",
+  "scope": "/01_Body_Transformation_Tracker/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#EDE8E2",
+  "theme_color": "#E8622A",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

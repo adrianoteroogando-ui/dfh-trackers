@@ -1,0 +1,25 @@
+{
+  "name": "12-Week Fitness Challenge \u2014 Digital Fitness Hub",
+  "short_name": "12-Week",
+  "description": "Track your 12-week fitness challenge with automatic calculations. No account, no subscription \u2014 data stays private on your device.",
+  "start_url": "/05_12_Week_Fitness_Challenge/",
+  "scope": "/05_12_Week_Fitness_Challenge/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#EDE8E2",
+  "theme_color": "#E8622A",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
